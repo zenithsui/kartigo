@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm install --frozen-lockfile && pnpm run typecheck:libs && node scripts/build-vercel.mjs",
+  "buildCommand": "pnpm install --frozen-lockfile && pnpm run typecheck:libs && pnpm --filter @workspace/api-server run build:vercel",
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": null
 }
