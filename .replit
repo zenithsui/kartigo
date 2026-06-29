@@ -1,0 +1,28 @@
+modules = ["nodejs-24", "python-3.11"]
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[deployment.postBuild]
+args = ["pnpm", "store", "prune"]
+env = { "CI" = "true" }
+
+[workflows]
+runButton = "Project"
+
+[agent]
+stack = "PNPM_WORKSPACE"
+expertMode = true
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+NEON_DATABASE_URL = "postgresql://neondb_owner:npg_XwGLP3vYSQ0E@ep-floral-meadow-aoeckp9l-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+CLOUDINARY_CLOUD_NAME = "dzcyziehh"
+CLOUDINARY_API_KEY = "386695942139964"
+CLOUDINARY_API_SECRET = "s3lphQlWafDv9vfcYrK8q7gkxYc"

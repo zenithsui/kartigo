@@ -1,0 +1,74 @@
+1. Acceptance of Terms
+By accessing or using Kartigo (kartigo.in), you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree to these terms, please do not use our platform.
+
+These terms apply to all visitors, users, and others who access or use Kartigo, whether as a buyer, seller, reseller, or guest.
+2. User Accounts
+**Registration:** You must create an account to purchase on Kartigo. Provide accurate, current, and complete information. You are responsible for keeping your account credentials secure.
+
+**Eligibility:** You must be at least 18 years old to register and transact on Kartigo. By creating an account, you confirm you meet this requirement.
+
+**Account Security:** You are responsible for all activity under your account. Notify us immediately at security@kartigo.in if you suspect unauthorised access.
+
+**One Account Per Person:** You may not create multiple accounts. Kartigo reserves the right to merge or terminate duplicate accounts.
+3. Buying on Kartigo
+**Order Placement:** By placing an order, you agree to purchase the item at the listed price, including applicable taxes and shipping charges.
+
+**Pricing:** Prices are in Indian Rupees (INR) and include GST. Prices may change without notice. Your order price is locked at the time of payment confirmation.
+
+**Availability:** Products are subject to availability. In rare cases, an order may be cancelled due to stock issues or seller unavailability. You will receive a full refund in such cases.
+
+**Fraud Prevention:** We reserve the right to cancel orders we reasonably suspect to be fraudulent, bulk purchases for resale (without prior arrangement), or placed using stolen payment credentials.
+4. Selling on Kartigo
+**Eligibility:** To list products on Kartigo, you must complete seller registration, provide valid GST and PAN, and agree to the Seller Agreement.
+
+**Product Listings:** You are solely responsible for the accuracy, legality, and quality of your product listings. Counterfeit, prohibited, or misrepresented items are strictly forbidden.
+
+**Order Fulfilment:** Sellers must dispatch orders within the committed timeline. Late shipments may result in penalties, account suspension, or de-listing.
+
+**Commission:** Kartigo charges a category-specific commission on each completed sale, deducted before payouts. Commission rates are communicated during onboarding.
+
+**Prohibited Products:** The following are prohibited on Kartigo: illegal items, weapons, drugs and controlled substances, adult content, counterfeit goods, recalled products, and items infringing third-party intellectual property.
+5. Payments
+**Payment Processing:** Payments are processed securely through Razorpay, a RBI-authorised payment aggregator. By paying, you agree to Razorpay's terms and privacy policy.
+
+**Refunds:** Refunds are processed to the original payment method within 5–7 business days after return approval. COD refunds are issued as Kartigo wallet credits or bank transfer.
+
+**Disputes:** For payment disputes, contact support@kartigo.in with your order ID and payment reference. We will investigate within 5 business days.
+6. Intellectual Property
+All content on Kartigo — including logos, design, text, graphics, software, and data — is the property of Kartigo Technologies Pvt. Ltd. or its licensors, protected under Indian and international intellectual property laws.
+
+You may not copy, reproduce, distribute, or create derivative works from our content without explicit written permission.
+
+User-generated content (reviews, photos) remains your property. By submitting content, you grant Kartigo a worldwide, royalty-free licence to use, display, and modify it for platform purposes.
+7. Prohibited Conduct
+You agree NOT to:
+
+• Use the platform for any unlawful purpose or in violation of these terms
+• Post false, misleading, or defamatory content
+• Attempt to access other users' accounts or data
+• Use automated bots, scrapers, or crawlers without permission
+• Interfere with the platform's security, performance, or availability
+• Engage in price manipulation, fake reviews, or review bombing
+• Resell products purchased on Kartigo without prior written consent
+• Harass, abuse, or discriminate against other users or Kartigo staff
+8. Limitation of Liability
+To the maximum extent permitted by law, Kartigo shall not be liable for:
+
+• Indirect, incidental, or consequential damages
+• Loss of profits, data, or goodwill
+• Damages arising from your use of third-party services linked from our platform
+• Product defects or issues caused by the seller
+
+Our maximum liability to you for any claim arising from use of Kartigo shall not exceed the amount you paid for the specific order giving rise to the claim.
+9. Governing Law & Disputes
+These Terms are governed by the laws of India. Any disputes arising from these Terms or your use of Kartigo shall be subject to the exclusive jurisdiction of courts in Bengaluru, Karnataka, India.
+
+For consumer disputes, you may also approach the National Consumer Disputes Redressal Commission (NCDRC) or the relevant State Consumer Commission.
+
+We encourage resolving disputes informally first — contact support@kartigo.in and we'll do our best to reach a fair resolution.
+10. Changes to Terms
+We may modify these Terms at any time. We will provide at least 15 days' notice of material changes via email or platform notification. Continued use of Kartigo after the effective date of changes constitutes acceptance.
+
+If you disagree with the revised Terms, you must stop using Kartigo and may close your account.
+
+For questions about these Terms, contact legal@kartigo.in.

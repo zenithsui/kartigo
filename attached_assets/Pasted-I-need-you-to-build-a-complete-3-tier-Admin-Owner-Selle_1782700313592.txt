@@ -1,0 +1,171 @@
+I need you to build a complete 3-tier Admin + Owner + Seller Panel for Kartigo. Think how Amazon and Flipkart handle their internal systems — three completely separate dashboards, each with their own access level and powers.
+
+👑 TIER 1 — OWNER PANEL (/owner)
+Only 1 person has this — the person who built Kartigo (me)
+
+Login: owner@kartigo.com / Owner@123
+Owner can do EVERYTHING plus:
+
+See entire platform revenue + commission earned from all sellers
+Set platform commission % per category (like Amazon takes 5-15%)
+Approve or reject ADMIN accounts
+Create / delete Admin accounts
+Toggle entire platform maintenance mode
+See all admins and their activity logs
+Change Razorpay live/test keys
+Change site name, logo, favicon, contact email
+Full financial dashboard — total GMV, platform earnings, payouts
+Ban any seller, admin, or customer permanently
+Export entire platform data as CSV
+Feature flags — turn any feature on/off without code changes
+
+This panel is invisible to everyone else. No link, no access, nothing.
+
+🛡️ TIER 2 — ADMIN PANEL (/admin)
+Trusted people appointed by Owner
+
+Login: admin@kartigo.com / Admin@123
+Dashboard:
+
+Total revenue card
+Total orders card
+Total products card
+Total users card
+Total sellers card
+Live graph — orders per day (last 30 days)
+Recent orders table
+Low stock alerts
+
+Products Management:
+
+Add / Edit / Delete any product on platform
+Cloudinary image upload — drag and drop
+Set price, MRP, discount, stock, category, variants (size/color)
+Bulk upload via CSV
+Product status toggle (active/inactive)
+Feature products on homepage
+
+Orders Management:
+
+All orders across all sellers
+Filter by pending/shipped/delivered/cancelled/refund
+Update order status
+View full order details — items, customer, address, payment
+Initiate refunds
+Export orders as CSV
+
+Users Management:
+
+All customers list
+Ban / unban user
+View order history per user
+Send email to any user
+
+Sellers Management:
+
+Pending seller approvals — approve / reject with reason
+Active sellers list
+View each seller's products, orders, revenue
+Suspend seller account
+Set per-seller commission override
+
+Categories Management:
+
+Add / edit / delete categories
+Upload category image via Cloudinary
+Set category order on homepage
+
+Banners Management:
+
+Add homepage banners
+Upload via Cloudinary
+Set banner link, position, schedule (start/end date), active/inactive
+
+Coupons Management:
+
+Create discount coupons
+Set percentage or flat discount
+Set expiry date, usage limit, minimum order value
+Deactivate coupons anytime
+
+Reviews Management:
+
+See all reviews across platform
+Delete fake/spam reviews
+Flag suspicious reviews
+
+
+🏪 TIER 3 — SELLER DASHBOARD (/seller)
+Anyone who registers as a seller and gets approved by Admin
+
+Login: their own email/password after approval
+Seller Dashboard:
+
+Their own revenue only (not others)
+Their orders count
+Their products count
+Earnings graph — last 30 days
+Pending payouts amount
+
+My Products:
+
+Add / Edit / Delete only their own products
+Cloudinary image upload
+Set price, MRP, stock, variants
+Cannot touch other sellers' products
+
+My Orders:
+
+Only orders for their products
+Update shipping status
+Print invoice per order
+Cannot see other sellers' orders
+
+Payouts:
+
+Total earned
+Platform commission deducted (set by owner)
+Payout history
+Bank account details form
+
+My Store:
+
+Custom seller store page at /store/[sellerSlug]
+Upload store logo and banner
+Store description
+All their products listed beautifully (like Amazon seller page)
+
+Referral/Reseller:
+
+Their unique share-and-earn link
+How many people clicked
+How much commission earned from referrals
+
+
+🎨 Design Requirements
+
+Each panel has its own distinct color theme
+
+Owner → Deep Gold #B45309 (exclusive, powerful)
+Admin → Deep Indigo #3730A3 (Kartigo brand)
+Seller → Emerald Green #059669 (growth, business)
+
+
+Sidebar navigation on all three
+Dark/light mode toggle on all three
+Fully mobile responsive
+Premium feel — not a basic CRUD panel
+
+
+🔒 Security Rules
+
+Owner route — completely hidden, no public link
+Admin cannot access Owner panel ever
+Seller cannot access Admin or Owner panel ever
+JWT role check on every single API route
+Rate limiting on all login pages
+Activity logs for Admin and Owner actions
+
+
+This is not a basic admin panel. This is a real multi-tier business operating system — like how Amazon internally manages sellers, admins, and platform owners separately.
+Every section fully functional. Every button works. No placeholders. No "coming soon." Build it like it goes live tomorrow. 🚀

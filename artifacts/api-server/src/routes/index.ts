@@ -1,0 +1,46 @@
+import { Router, type IRouter } from "express";
+import healthRouter from "./health";
+import authRouter from "./auth";
+import customAuthRouter from "./custom-auth";
+import usersRouter from "./users";
+import productsRouter from "./products";
+import categoriesRouter from "./categories";
+import brandsRouter from "./brands";
+import cartRouter from "./cart";
+import wishlistRouter from "./wishlist";
+import ordersRouter from "./orders";
+import reviewsRouter from "./reviews";
+import searchRouter from "./search";
+import sellersRouter from "./sellers";
+import rewardsRouter from "./rewards";
+import referralsRouter from "./referrals";
+import promotionsRouter from "./promotions";
+import paymentRouter from "./payment";
+import adminRouter from "./admin";
+import uploadRouter from "./upload";
+import ownerRouter from "./owner";
+
+const router: IRouter = Router();
+
+router.use(healthRouter);
+router.use(authRouter);
+router.use(customAuthRouter);
+router.use(usersRouter);
+router.use(productsRouter);
+router.use(categoriesRouter);
+router.use(brandsRouter);
+router.use(cartRouter);
+router.use(wishlistRouter);
+router.use(ordersRouter);
+router.use(reviewsRouter);
+router.use(searchRouter);
+router.use(sellersRouter);
+router.use(rewardsRouter);
+router.use(referralsRouter);
+router.use(promotionsRouter);
+router.use(paymentRouter);
+router.use(adminRouter);
+router.use(uploadRouter);
+router.use(ownerRouter);
+
+export default router;

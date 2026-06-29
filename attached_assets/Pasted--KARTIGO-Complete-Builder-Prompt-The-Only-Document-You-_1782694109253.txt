@@ -1,0 +1,1802 @@
+# KARTIGO — Complete Builder Prompt
+### The Only Document You Need. Read Every Line. Build Every Feature.
+
+---
+
+## 🧠 BEFORE YOU WRITE A SINGLE LINE OF CODE — READ THIS
+
+You are building **Kartigo** — a full-stack, production-ready, launch-grade e-commerce platform that blends the DNA of four Indian e-commerce giants into one cohesive experience:
+
+| Platform | What Kartigo takes from it |
+|----------|---------------------------|
+| **Amazon** | Catalog depth, verified reviews with photos, trust badges, delivery estimates, seller marketplace infrastructure |
+| **Flipkart** | Flash sales with countdown timers, Big Billion Day-style banners, SuperCoins-style reward system (KartiCoins), deal-driven excitement |
+| **Meesho** | Reseller share-and-earn model, social commerce links, referral tracking, commission-based reselling, low-price focus |
+| **Myntra** | Fashion-forward UI, brand storefronts, lookbook-style curated collections, size/color/style filters, premium design aesthetic |
+
+**These are not four feature sets bolted together.** They are one unified shopping experience where a user can:
+
+1. Browse curated fashion lookbooks styled like Myntra →
+2. Discover a flash sale with a live countdown timer like Flipkart →
+3. Read 47 verified purchase reviews with photo evidence like Amazon →
+4. Share the product to their WhatsApp group and earn commission like Meesho →
+5. Checkout with Razorpay and earn KartiCoins →
+6. Track their order with a real-time status timeline
+
+**That's one user journey. That's Kartigo.**
+
+---
+
+### 🚫 THE RULES — NON-NEGOTIABLE
+
+1. **Every feature works end-to-end.** If a button exists, it does something real. If a page exists, it's fully built. If a flow exists, it completes. No placeholders. No "coming soon." No `TODO` comments. No `lorem ipsum`. No empty modals. No skeleton screens that never resolve.
+
+2. **This ships tomorrow.** Write every component, every API route, every database query as if a real Indian consumer will use it within 24 hours.
+
+3. **Build for India.** Prices in ₹ (INR). Addresses with PIN codes. Phone numbers with +91. Payment via Razorpay. Delivery estimates in Indian geography. Hindi/English sensibility in UX copy.
+
+4. **No generic Bootstrap/template aesthetics.** The homepage must feel alive — like walking into a massive mall during Diwali sale season. If it looks like a tutorial project, you've failed.
+
+5. **Zero `any` types in TypeScript.** Strict mode. Type everything. Prisma-generated types flow from DB → API → Frontend.
+
+6. **No hardcoded secrets.** Everything through environment variables.
+
+### What Failure Looks Like
+
+- A homepage that looks like a Bootstrap starter template
+- Product pages without reviews, ratings, delivery estimates, or seller info
+- A cart that doesn't persist across sessions
+- An admin panel that can't actually manage products
+- Auth that's half-implemented (login works, register doesn't)
+- Search that only matches exact titles
+- Mobile experience that's an afterthought
+- Flash sale timers that don't count down
+- "Share & Earn" buttons that generate no link
+
+**If any of the above describes what you build, you have failed. Don't let it happen.**
+
+---
+
+## SECTION 1 — TECHNOLOGY STACK (LOCKED — DO NOT CHANGE)
+
+Every tool below has been specifically chosen. Do not substitute.
+
+### Core Framework
+```
+Runtime:          Node.js 20 LTS
+Framework:        Next.js 14+ (App Router, NOT Pages Router)
+Language:         TypeScript (strict mode enabled in tsconfig.json)
+Styling:          Tailwind CSS 3.4+
+UI Components:    shadcn/ui (install via npx shadcn-ui@latest init)
+State Management: Zustand (client-side cart, wishlist, UI state)
+Server State:     TanStack Query (React Query) for data fetching/caching
+Forms:            React Hook Form + Zod validation schemas
+```
+
+### Backend & Data
+```
+Database:         PostgreSQL (hosted on Supabase — free tier)
+ORM:              Prisma (with prisma generate, prisma migrate, prisma db seed)
+Authentication:   NextAuth.js v5 (Auth.js)
+                  → Credentials provider (email/password, bcrypt hashing)
+                  → Google OAuth provider (ENABLED — user confirmed)
+                  → Phone OTP provider (mock with fixed code 123456 in dev)
+File Storage:     Cloudinary (product images, review photos, brand logos)
+Payments:         Razorpay (TEST MODE keys — full integration with webhook)
+Email:            Resend (transactional emails — order confirmation, password reset)
+```
+
+### Deployment Targets
+```
+App Hosting:      Vercel (optimized next.config.js for Vercel)
+Database:         Supabase PostgreSQL
+Image CDN:        Cloudinary
+Domain:           Custom domain later (build for NEXT_PUBLIC_APP_URL flexibility)
+```
+
+### Branding (Temporary — will be swapped later)
+```
+Name:             Kartigo
+Logo:             Text-based SVG wordmark "Kartigo" with small shopping-bag icon
+                  (generate inline as SVG component — will be replaced)
+Color Palette:
+  Primary:        #3730A3 (Deep Indigo — trust, authority)
+  Accent:         #FB7185 (Coral — energy, action, CTAs)
+  Background:     #FAFAFA (Soft white)
+  Text:           #18181B (Charcoal)
+  Success:        #22C55E (Green)
+  Warning:        #F59E0B (Amber)
+  Error:          #EF4444 (Red)
+  Surface:        #FFFFFF (Cards, panels)
+Typography:
+  Headings:       "Poppins" from Google Fonts (via next/font)
+  Body/UI:        "Inter" from Google Fonts (via next/font)
+```
+
+---
+
+## SECTION 2 — PROJECT FILE STRUCTURE (~80+ files)
+
+Build this exact structure. Every file listed here must exist and contain real, working code.
+
+```
+kartigo/
+├── .env.example
+├── .eslintrc.json
+├── .prettierrc
+├── next.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+├── package.json
+├── README.md
+│
+├── prisma/
+│   ├── schema.prisma              ← All 16+ models
+│   ├── seed.ts                    ← 50+ products, 100+ reviews, 5+ sellers, coupons, banners
+│   └── migrations/
+│
+├── public/
+│   ├── icons/
+│   ├── images/
+│   └── favicon.ico
+│
+├── src/
+│   ├── middleware.ts               ← Role-based route protection
+│   │
+│   ├── app/
+│   │   ├── layout.tsx              ← Root layout (fonts, theme, providers)
+│   │   ├── globals.css             ← Tailwind base + custom CSS
+│   │   ├── page.tsx                ← Homepage (redirect or direct render)
+│   │   │
+│   │   ├── (auth)/                 ← Auth route group
+│   │   │   ├── login/page.tsx
+│   │   │   ├── register/page.tsx
+│   │   │   └── forgot-password/page.tsx
+│   │   │
+│   │   ├── (storefront)/           ← Public shopping pages
+│   │   │   ├── page.tsx                    ← Homepage
+│   │   │   ├── category/[slug]/page.tsx    ← Category listing + filters
+│   │   │   ├── product/[slug]/page.tsx     ← Product detail page
+│   │   │   ├── search/page.tsx             ← Search results
+│   │   │   ├── brand/[slug]/page.tsx       ← Brand storefront
+│   │   │   └── layout.tsx                  ← Storefront layout (header + footer)
+│   │   │
+│   │   ├── (account)/              ← Authenticated customer pages
+│   │   │   ├── layout.tsx                  ← Account sidebar layout
+│   │   │   ├── profile/page.tsx
+│   │   │   ├── orders/page.tsx
+│   │   │   ├── orders/[id]/page.tsx        ← Order detail + tracking
+│   │   │   ├── wishlist/page.tsx
+│   │   │   ├── addresses/page.tsx
+│   │   │   ├── rewards/page.tsx            ← KartiCoins dashboard
+│   │   │   ├── reviews/page.tsx
+│   │   │   ├── referrals/page.tsx
+│   │   │   ├── reseller/page.tsx           ← Reseller earnings dashboard
+│   │   │   ├── notifications/page.tsx
+│   │   │   └── settings/page.tsx
+│   │   │
+│   │   ├── cart/page.tsx                   ← Full cart page
+│   │   ├── wishlist/page.tsx               ← Public wishlist page
+│   │   ├── checkout/page.tsx               ← Multi-step checkout
+│   │   ├── order/
+│   │   │   └── confirmation/[id]/page.tsx  ← Post-purchase confirmation
+│   │   │
+│   │   ├── seller/                 ← Seller dashboard (SELLER role only)
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx                    ← Seller overview
+│   │   │   ├── register/page.tsx           ← Seller onboarding form
+│   │   │   ├── products/page.tsx           ← CRUD products
+│   │   │   ├── products/new/page.tsx       ← Add product form
+│   │   │   ├── products/[id]/edit/page.tsx ← Edit product
+│   │   │   ├── orders/page.tsx
+│   │   │   ├── store/page.tsx              ← Edit store profile
+│   │   │   ├── finances/page.tsx           ← Revenue, payouts
+│   │   │   └── reviews/page.tsx
+│   │   │
+│   │   ├── admin/                  ← Admin panel (ADMIN role only)
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx                    ← Admin dashboard
+│   │   │   ├── users/page.tsx
+│   │   │   ├── products/page.tsx
+│   │   │   ├── orders/page.tsx
+│   │   │   ├── categories/page.tsx
+│   │   │   ├── brands/page.tsx
+│   │   │   ├── sellers/page.tsx
+│   │   │   ├── promotions/page.tsx         ← Coupons + flash sales + banners
+│   │   │   ├── reviews/page.tsx
+│   │   │   └── settings/page.tsx
+│   │   │
+│   │   ├── about/page.tsx
+│   │   ├── contact/page.tsx
+│   │   ├── faq/page.tsx
+│   │   ├── privacy-policy/page.tsx
+│   │   ├── terms/page.tsx
+│   │   ├── return-policy/page.tsx
+│   │   ├── sell-on-kartigo/page.tsx
+│   │   │
+│   │   └── api/
+│   │       ├── auth/[...nextauth]/route.ts
+│   │       ├── products/route.ts           ← GET (list+search+filter), POST (create)
+│   │       ├── products/[slug]/route.ts    ← GET (detail), PUT, DELETE
+│   │       ├── products/featured/route.ts
+│   │       ├── products/flash-sale/route.ts
+│   │       ├── categories/route.ts         ← GET, POST
+│   │       ├── categories/[slug]/route.ts  ← GET, PUT, DELETE
+│   │       ├── brands/route.ts
+│   │       ├── brands/[slug]/route.ts
+│   │       ├── cart/route.ts               ← GET, POST (add), PUT (update qty)
+│   │       ├── cart/[itemId]/route.ts       ← DELETE (remove item)
+│   │       ├── cart/coupon/route.ts         ← POST (apply), DELETE (remove)
+│   │       ├── wishlist/route.ts           ← GET, POST (toggle)
+│   │       ├── wishlist/[productId]/route.ts ← DELETE
+│   │       ├── orders/route.ts             ← GET (user's), POST (create)
+│   │       ├── orders/[id]/route.ts        ← GET (detail)
+│   │       ├── orders/[id]/status/route.ts ← PUT (seller/admin update)
+│   │       ├── orders/[id]/cancel/route.ts ← POST
+│   │       ├── orders/[id]/return/route.ts ← POST
+│   │       ├── payment/
+│   │       │   ├── create-order/route.ts   ← Razorpay order creation
+│   │       │   ├── verify/route.ts         ← Signature verification
+│   │       │   └── webhook/route.ts        ← Razorpay webhook handler
+│   │       ├── reviews/route.ts            ← POST (create)
+│   │       ├── reviews/[id]/route.ts       ← PUT, DELETE
+│   │       ├── reviews/[id]/helpful/route.ts ← POST (vote)
+│   │       ├── reviews/product/[productId]/route.ts ← GET
+│   │       ├── search/route.ts             ← GET (full-text search)
+│   │       ├── search/suggestions/route.ts ← GET (autocomplete)
+│   │       ├── sellers/route.ts            ← GET (list)
+│   │       ├── sellers/apply/route.ts      ← POST (seller application)
+│   │       ├── sellers/[slug]/route.ts     ← GET, PUT
+│   │       ├── referrals/route.ts          ← GET (user's referrals)
+│   │       ├── referrals/track/route.ts    ← POST (track click/conversion)
+│   │       ├── rewards/route.ts            ← GET balance + history
+│   │       ├── rewards/redeem/route.ts     ← POST
+│   │       ├── promotions/
+│   │       │   ├── flash-sales/route.ts
+│   │       │   ├── coupons/validate/route.ts
+│   │       │   └── banners/route.ts
+│   │       ├── upload/route.ts             ← Cloudinary image upload
+│   │       └── admin/
+│   │           ├── users/route.ts
+│   │           ├── users/[id]/route.ts
+│   │           ├── dashboard/route.ts      ← Platform-wide stats
+│   │           ├── sellers/[id]/route.ts   ← Approve/reject
+│   │           └── settings/route.ts
+│   │
+│   ├── components/
+│   │   ├── ui/                             ← shadcn/ui primitives
+│   │   │   └── (button, input, card, dialog, dropdown, sheet, skeleton,
+│   │   │       tabs, badge, avatar, tooltip, separator, select, slider,
+│   │   │       accordion, toast, checkbox, radio-group, switch, table,
+│   │   │       textarea, popover, command, etc.)
+│   │   │
+│   │   ├── layout/
+│   │   │   ├── Header.tsx                  ← Logo, search bar, nav icons, mega menu
+│   │   │   ├── Footer.tsx                  ← Multi-column footer
+│   │   │   ├── MegaMenu.tsx                ← Category hover menu with images
+│   │   │   ├── MobileNav.tsx               ← Bottom tab bar (mobile)
+│   │   │   ├── SearchBar.tsx               ← Autocomplete with suggestions
+│   │   │   ├── AnnouncementBar.tsx         ← Scrolling offers ticker
+│   │   │   ├── AccountSidebar.tsx          ← Account dashboard nav
+│   │   │   ├── AdminSidebar.tsx            ← Admin panel nav
+│   │   │   └── SellerSidebar.tsx           ← Seller dashboard nav
+│   │   │
+│   │   ├── home/
+│   │   │   ├── HeroCarousel.tsx            ← 5-6 slide auto-rotate banner
+│   │   │   ├── CategoryStrip.tsx           ← Circular category icons row
+│   │   │   ├── FlashSaleSection.tsx        ← ⚡ with countdown + product scroll
+│   │   │   ├── DealOfTheDay.tsx            ← Featured product hero card
+│   │   │   ├── CuratedCollections.tsx      ← Myntra-style lookbook grid
+│   │   │   ├── TopBrands.tsx               ← Brand logo grid with discount overlay
+│   │   │   ├── CategoryProductGrid.tsx     ← "Best in Electronics" sections
+│   │   │   ├── ResellerBanner.tsx          ← "Earn with Kartigo" CTA section
+│   │   │   └── RecentlyViewed.tsx          ← Horizontal product scroll
+│   │   │
+│   │   ├── product/
+│   │   │   ├── ProductCard.tsx             ← Standard product card (image, title, price, rating, discount badge)
+│   │   │   ├── ProductGrid.tsx             ← Grid/list layout wrapper
+│   │   │   ├── ProductGallery.tsx          ← Main image + thumbnails + zoom
+│   │   │   ├── ProductInfo.tsx             ← Title, brand, price, variants, CTA buttons
+│   │   │   ├── VariantSelector.tsx         ← Color swatches + size buttons
+│   │   │   ├── DeliveryEstimate.tsx        ← PIN code input → delivery date
+│   │   │   ├── SellerInfo.tsx              ← Sold by X (rating) badge
+│   │   │   ├── ProductOffers.tsx           ← Bank offers, coupons, partner deals
+│   │   │   ├── ProductTabs.tsx             ← Description, Specs, Reviews, Q&A tabs
+│   │   │   ├── SpecsTable.tsx              ← Key-value specification table
+│   │   │   ├── ReviewSection.tsx           ← Ratings breakdown + review list + write review
+│   │   │   ├── ReviewCard.tsx              ← Individual review with photos, helpful vote
+│   │   │   ├── SimilarProducts.tsx         ← "You might also like" carousel
+│   │   │   └── AlsoBought.tsx             ← "Customers also bought" carousel
+│   │   │
+│   │   ├── filters/
+│   │   │   ├── FilterSidebar.tsx           ← Desktop filter panel
+│   │   │   ├── FilterSheet.tsx             ← Mobile bottom sheet filters
+│   │   │   ├── PriceRangeSlider.tsx
+│   │   │   ├── ColorSwatches.tsx
+│   │   │   ├── SizeSelector.tsx
+│   │   │   ├── BrandFilter.tsx
+│   │   │   ├── RatingFilter.tsx
+│   │   │   └── ActiveFilters.tsx           ← Removable filter chips
+│   │   │
+│   │   ├── cart/
+│   │   │   ├── CartItem.tsx
+│   │   │   ├── CartSummary.tsx             ← Price breakdown + CTA
+│   │   │   ├── MiniCart.tsx                ← Hover preview in header
+│   │   │   ├── CouponInput.tsx
+│   │   │   └── EmptyCart.tsx
+│   │   │
+│   │   ├── checkout/
+│   │   │   ├── AddressStep.tsx
+│   │   │   ├── OrderReview.tsx
+│   │   │   ├── PaymentStep.tsx             ← Razorpay popup trigger
+│   │   │   └── OrderConfirmation.tsx       ← Success with confetti
+│   │   │
+│   │   ├── order/
+│   │   │   ├── OrderCard.tsx
+│   │   │   ├── OrderTimeline.tsx           ← Visual stepper
+│   │   │   └── OrderDetail.tsx
+│   │   │
+│   │   ├── seller/
+│   │   │   ├── SellerProductForm.tsx       ← Add/edit product form
+│   │   │   ├── SellerOrderTable.tsx
+│   │   │   └── RevenueChart.tsx
+│   │   │
+│   │   ├── admin/
+│   │   │   ├── DashboardStats.tsx          ← Metric cards + charts
+│   │   │   ├── DataTable.tsx              ← Reusable data table
+│   │   │   ├── UserManagement.tsx
+│   │   │   ├── ProductApproval.tsx
+│   │   │   ├── BannerManager.tsx
+│   │   │   ├── CouponManager.tsx
+│   │   │   └── FlashSaleManager.tsx
+│   │   │
+│   │   └── shared/
+│   │       ├── CountdownTimer.tsx          ← Live HH:MM:SS with flip animation
+│   │       ├── RatingStars.tsx             ← Visual star display (filled/half/empty)
+│   │       ├── PriceBadge.tsx              ← ₹price ~~MRP~~ discount%
+│   │       ├── TrustBadges.tsx             ← 🔒 Secure | 🔄 Returns | ✅ Genuine | 🚚 Free
+│   │       ├── ShareButtons.tsx            ← WhatsApp, Facebook, Twitter, Copy link
+│   │       ├── ShareAndEarn.tsx            ← Meesho-style "Share & Earn ₹XX" button
+│   │       ├── EmptyState.tsx              ← Reusable illustration + message + CTA
+│   │       ├── SkeletonLoader.tsx          ← Pulse animation skeleton
+│   │       ├── ConfettiEffect.tsx          ← Order confirmation confetti
+│   │       ├── Toast.tsx                   ← Notification toasts
+│   │       ├── LoadingSpinner.tsx
+│   │       └── Breadcrumbs.tsx
+│   │
+│   ├── lib/
+│   │   ├── prisma.ts                       ← Prisma singleton client
+│   │   ├── auth.ts                         ← NextAuth configuration
+│   │   ├── razorpay.ts                     ← Razorpay server client
+│   │   ├── cloudinary.ts                   ← Cloudinary upload config
+│   │   ├── utils.ts                        ← formatPrice, slugify, truncate, etc.
+│   │   ├── validators.ts                   ← All Zod schemas
+│   │   ├── constants.ts                    ← App-wide constants, KartiCoin rates
+│   │   └── email.ts                        ← Resend email sender
+│   │
+│   ├── hooks/
+│   │   ├── useCart.ts                       ← Cart operations hook
+│   │   ├── useWishlist.ts
+│   │   ├── useSearch.ts                     ← Debounced search with suggestions
+│   │   ├── useDebounce.ts
+│   │   ├── useCountdown.ts                  ← Flash sale timer logic
+│   │   ├── useMediaQuery.ts
+│   │   └── useLocalStorage.ts
+│   │
+│   ├── store/
+│   │   ├── cartStore.ts                     ← Zustand — cart items, total, operations
+│   │   ├── wishlistStore.ts
+│   │   ├── searchStore.ts                   ← Recent searches, trending
+│   │   └── uiStore.ts                       ← Mobile menu, modals, toasts
+│   │
+│   ├── types/
+│   │   └── index.ts                         ← Shared TypeScript interfaces/types
+│   │
+│   └── providers/
+│       ├── AuthProvider.tsx                  ← NextAuth SessionProvider
+│       ├── QueryProvider.tsx                 ← TanStack Query provider
+│       └── ThemeProvider.tsx                 ← If dark mode supported
+```
+
+---
+
+## SECTION 3 — DATABASE SCHEMA (Prisma)
+
+This is the exact Prisma schema. Implement all models, all fields, all relations, all enums.
+
+```prisma
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════════
+
+enum UserRole {
+  CUSTOMER
+  SELLER
+  ADMIN
+}
+
+enum AddressType {
+  HOME
+  WORK
+  OTHER
+}
+
+enum OrderStatus {
+  PLACED
+  CONFIRMED
+  PACKED
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  RAZORPAY
+  COD
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED
+  FREE_SHIPPING
+}
+
+enum RewardType {
+  EARNED
+  REDEEMED
+  EXPIRED
+  BONUS
+}
+
+enum ReferralStatus {
+  PENDING
+  COMPLETED
+}
+
+enum BannerPosition {
+  HERO
+  SIDEBAR
+  CATEGORY
+  POPUP
+}
+
+enum SellerApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ═══════════════════════════════════════
+// MODELS
+// ═══════════════════════════════════════
+
+model User {
+  id              String    @id @default(cuid())
+  name            String
+  email           String    @unique
+  phone           String?   @unique
+  passwordHash    String?
+  avatar          String?
+  role            UserRole  @default(CUSTOMER)
+  emailVerified   DateTime?
+  phoneVerified   Boolean   @default(false)
+  referralCode    String    @unique @default(cuid())
+  referredBy      String?
+  rewardCoins     Int       @default(0)
+
+  // Relations
+  addresses       Address[]
+  orders          Order[]
+  reviews         Review[]
+  wishlistItems   WishlistItem[]
+  cart            Cart?
+  seller          Seller?
+  referralsMade   Referral[]       @relation("ReferralsMade")
+  referralReceived Referral?       @relation("ReferralReceived")
+  shareLinks      ShareLink[]
+  rewardHistory   RewardTransaction[]
+  notifications   Notification[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Address {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName        String
+  phone           String
+  addressLine1    String
+  addressLine2    String?
+  city            String
+  state           String
+  pincode         String
+  landmark        String?
+  type            AddressType @default(HOME)
+  isDefault       Boolean     @default(false)
+
+  shippingOrders  Order[]     @relation("ShippingAddress")
+  billingOrders   Order[]     @relation("BillingAddress")
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Category {
+  id              String      @id @default(cuid())
+  name            String
+  slug            String      @unique
+  description     String?
+  image           String?
+  icon            String?
+  parentId        String?
+  parent          Category?   @relation("CategoryChildren", fields: [parentId], references: [id])
+  children        Category[]  @relation("CategoryChildren")
+  products        Product[]
+  isActive        Boolean     @default(true)
+  sortOrder       Int         @default(0)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Brand {
+  id              String      @id @default(cuid())
+  name            String
+  slug            String      @unique
+  logo            String?
+  bannerImage     String?
+  description     String?
+  isActive        Boolean     @default(true)
+  isFeatured      Boolean     @default(false)
+  products        Product[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Product {
+  id              String      @id @default(cuid())
+  title           String
+  slug            String      @unique
+  description     String      @db.Text
+  richDescription String?     @db.Text
+  basePrice       Float
+  sellingPrice    Float
+  discount        Float       @default(0)
+  images          String[]
+  thumbnail       String?
+  categoryId      String
+  category        Category    @relation(fields: [categoryId], references: [id])
+  brandId         String?
+  brand           Brand?      @relation(fields: [brandId], references: [id])
+  sellerId        String
+  seller          Seller      @relation(fields: [sellerId], references: [id])
+  stock           Int         @default(0)
+  sku             String?     @unique
+  weight          Float?
+  tags            String[]
+  attributes      Json?
+  variants        ProductVariant[]
+  averageRating   Float       @default(0)
+  totalReviews    Int         @default(0)
+  totalSold       Int         @default(0)
+  isActive        Boolean     @default(true)
+  isFeatured      Boolean     @default(false)
+  isFlashSale     Boolean     @default(false)
+  flashSalePrice  Float?
+  flashSaleStart  DateTime?
+  flashSaleEnd    DateTime?
+  metaTitle       String?
+  metaDescription String?
+
+  reviews         Review[]
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+  wishlistItems   WishlistItem[]
+  shareLinks      ShareLink[]
+  flashSales      FlashSaleProduct[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model ProductVariant {
+  id              String      @id @default(cuid())
+  productId       String
+  product         Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name            String
+  sku             String?
+  price           Float?
+  stock           Int         @default(0)
+  images          String[]
+  attributes      Json?
+
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Seller {
+  id              String      @id @default(cuid())
+  userId          String      @unique
+  user            User        @relation(fields: [userId], references: [id])
+  storeName       String
+  storeSlug       String      @unique
+  storeLogo       String?
+  storeBanner     String?
+  description     String?     @db.Text
+  gstNumber       String?
+  panNumber       String?
+  bankAccountName String?
+  bankAccountNumber String?
+  bankIfsc        String?
+  applicationStatus SellerApplicationStatus @default(PENDING)
+  isVerified      Boolean     @default(false)
+  isActive        Boolean     @default(false)
+  rating          Float       @default(0)
+  totalSales      Int         @default(0)
+  totalProducts   Int         @default(0)
+  commissionRate  Float       @default(10)
+  balance         Float       @default(0)
+
+  products        Product[]
+  orderItems      OrderItem[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Cart {
+  id              String      @id @default(cuid())
+  userId          String?     @unique
+  user            User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId       String?     @unique
+  couponCode      String?
+  couponDiscount  Float       @default(0)
+  items           CartItem[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model CartItem {
+  id              String      @id @default(cuid())
+  cartId          String
+  cart            Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product     @relation(fields: [productId], references: [id])
+  variantId       String?
+  variant         ProductVariant? @relation(fields: [variantId], references: [id])
+  quantity        Int         @default(1)
+  priceAtAdd      Float
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([cartId, productId, variantId])
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  orderNumber     String        @unique
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  subtotal        Float
+  discount        Float         @default(0)
+  couponCode      String?
+  couponDiscount  Float         @default(0)
+  shippingCost    Float         @default(0)
+  tax             Float         @default(0)
+  total           Float
+  shippingAddressId String
+  shippingAddress   Address     @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  billingAddressId  String?
+  billingAddress    Address?    @relation("BillingAddress", fields: [billingAddressId], references: [id])
+  paymentMethod   PaymentMethod @default(RAZORPAY)
+  paymentStatus   PaymentStatus @default(PENDING)
+  razorpayOrderId String?
+  razorpayPaymentId String?
+  razorpaySignature String?
+  orderStatus     OrderStatus   @default(PLACED)
+  trackingNumber  String?
+  estimatedDelivery DateTime?
+  rewardCoinsEarned Int         @default(0)
+  rewardCoinsUsed   Int         @default(0)
+  notes           String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model OrderItem {
+  id              String        @id @default(cuid())
+  orderId         String
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product       @relation(fields: [productId], references: [id])
+  variantId       String?
+  variant         ProductVariant? @relation(fields: [variantId], references: [id])
+  sellerId        String
+  seller          Seller        @relation(fields: [sellerId], references: [id])
+  title           String
+  image           String?
+  price           Float
+  quantity        Int
+  itemStatus      OrderStatus   @default(PLACED)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Review {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  productId       String
+  product         Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderId         String?
+  rating          Int
+  title           String?
+  body            String        @db.Text
+  images          String[]
+  isVerifiedPurchase Boolean    @default(false)
+  helpfulCount    Int           @default(0)
+  reportCount     Int           @default(0)
+  isApproved      Boolean       @default(true)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([userId, productId])
+}
+
+model WishlistItem {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime      @default(now())
+
+  @@unique([userId, productId])
+}
+
+model Referral {
+  id              String          @id @default(cuid())
+  referrerId      String
+  referrer        User            @relation("ReferralsMade", fields: [referrerId], references: [id])
+  referredUserId  String          @unique
+  referredUser    User            @relation("ReferralReceived", fields: [referredUserId], references: [id])
+  referralCode    String
+  status          ReferralStatus  @default(PENDING)
+  rewardAmount    Int             @default(0)
+
+  createdAt       DateTime        @default(now())
+}
+
+model ShareLink {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  productId       String
+  product         Product       @relation(fields: [productId], references: [id])
+  uniqueCode      String        @unique @default(cuid())
+  clicks          Int           @default(0)
+  conversions     Int           @default(0)
+  commissionEarned Float        @default(0)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Coupon {
+  id                  String      @id @default(cuid())
+  code                String      @unique
+  description         String?
+  type                CouponType
+  value               Float
+  minOrderAmount      Float       @default(0)
+  maxDiscount         Float?
+  usageLimit          Int?
+  usedCount           Int         @default(0)
+  validFrom           DateTime
+  validTo             DateTime
+  isActive            Boolean     @default(true)
+  applicableCategories String[]
+  applicableProducts   String[]
+
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model FlashSale {
+  id              String              @id @default(cuid())
+  title           String
+  bannerImage     String?
+  startTime       DateTime
+  endTime         DateTime
+  isActive        Boolean             @default(true)
+  products        FlashSaleProduct[]
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+}
+
+model FlashSaleProduct {
+  id              String      @id @default(cuid())
+  flashSaleId     String
+  flashSale       FlashSale   @relation(fields: [flashSaleId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product     @relation(fields: [productId], references: [id])
+  salePrice       Float
+  quantityLimit   Int?
+  quantitySold    Int         @default(0)
+
+  @@unique([flashSaleId, productId])
+}
+
+model Banner {
+  id              String          @id @default(cuid())
+  title           String
+  image           String
+  mobileImage     String?
+  link            String?
+  position        BannerPosition  @default(HERO)
+  isActive        Boolean         @default(true)
+  sortOrder       Int             @default(0)
+  startDate       DateTime?
+  endDate         DateTime?
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model RewardTransaction {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  type            RewardType
+  coins           Int
+  description     String
+  orderId         String?
+  expiresAt       DateTime?
+
+  createdAt       DateTime      @default(now())
+}
+
+model Notification {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title           String
+  message         String
+  type            String        @default("general")
+  isRead          Boolean       @default(false)
+  link            String?
+
+  createdAt       DateTime      @default(now())
+}
+```
+
+---
+
+## SECTION 4 — BUILD PHASES (Execute in Order)
+
+### ⬛ PHASE 1 — Foundation (~15 files)
+
+**What to build:**
+- Initialize Next.js 14 project with App Router, TypeScript strict mode
+- Install and configure ALL dependencies:
+  ```
+  next react react-dom typescript @types/react @types/node
+  tailwindcss postcss autoprefixer
+  prisma @prisma/client
+  next-auth @auth/prisma-adapter
+  razorpay
+  zustand @tanstack/react-query
+  react-hook-form @hookform/resolvers zod
+  bcryptjs @types/bcryptjs
+  cloudinary
+  resend
+  lucide-react
+  class-variance-authority clsx tailwind-merge
+  @radix-ui/react-* (via shadcn)
+  recharts (for admin/seller charts)
+  embla-carousel-react (for carousels)
+  ```
+- Configure `tailwind.config.ts` with the exact Kartigo color palette (#3730A3, #FB7185, #FAFAFA, #18181B)
+- Configure `next.config.js` optimized for Vercel (images domains for Cloudinary, Unsplash)
+- Set up `tsconfig.json` with strict: true, paths aliases (`@/components/*`, `@/lib/*`, etc.)
+- Create `.env.example` with every variable (see Section 8)
+- Set up `globals.css` with Tailwind directives + custom base styles
+- Initialize shadcn/ui (`npx shadcn-ui@latest init`) — install at minimum: button, input, card, dialog, dropdown-menu, sheet, skeleton, tabs, badge, avatar, tooltip, separator, select, slider, accordion, toast, checkbox, switch, table, textarea, popover, command
+- Set up Google Fonts (Inter + Poppins) via `next/font/google`
+- Create root `layout.tsx` with providers (Auth, Query, Theme), metadata, fonts
+- Create `lib/prisma.ts` (singleton)
+- Create `lib/utils.ts` (cn helper, formatPrice ₹, slugify, generateOrderNumber)
+- Create `lib/constants.ts` (KARTICOIN_EARN_RATE, KARTICOIN_REDEEM_RATE, COD_FEE, etc.)
+- Write `README.md` with setup instructions, env vars, and run commands
+- Set up `middleware.ts` skeleton (will be populated in Phase 3)
+
+---
+
+### ⬛ PHASE 2 — Database (~3 files)
+
+**What to build:**
+- Write the complete `prisma/schema.prisma` (exactly as specified in Section 3 above — every model, every enum, every relation)
+- Create `prisma/seed.ts` — **this is critical.** The seed must populate:
+
+**Seed Data Requirements (minimum):**
+
+| Entity | Count | Details |
+|--------|-------|---------|
+| Users | 10 | 1 Admin (admin@kartigo.com / Admin@123), 3 Sellers, 6 Customers |
+| Sellers | 3 | With store names, descriptions, GST numbers, approved status |
+| Categories | 15+ | 5 parent categories, 2-3 subcategories each |
+| Brands | 12+ | Distributed across categories |
+| Products | 50+ | Evenly across categories. Each with: realistic Indian ₹ pricing, 3-6 image URLs (use Unsplash/Pexels URLs matching the product), detailed descriptions, specs JSON, tags. Some with variants. Some marked featured. Some marked flash sale. |
+| ProductVariants | 30+ | Size/color variants for fashion, storage variants for electronics |
+| Reviews | 100+ | Distributed across products, varied 1-5 star ratings, some with photo URLs, all marked verified purchase |
+| Orders | 20+ | Various statuses (PLACED through DELIVERED, some CANCELLED). Associated with customer accounts. |
+| Coupons | 3 | KARTIGO10 (10% off, min ₹499), FIRST50 (₹50 off first order), FREESHIP (free shipping, min ₹999) |
+| Flash Sales | 2 | Active, with 5 products each, countdown-valid time ranges |
+| Banners | 6 | 5 hero carousel banners + 1 category banner |
+| Referrals | 3 | Between user accounts |
+| Reward Transactions | 10+ | Earned/redeemed records |
+| Addresses | 10+ | Realistic Indian addresses with valid PIN codes |
+
+**The seed script must be runnable with `npx prisma db seed`.** Configure the seed command in `package.json`.
+
+**Category structure:**
+```
+Electronics
+  ├── Smartphones
+  ├── Laptops & Computers
+  ├── Headphones & Audio
+  ├── Cameras
+  └── Smartwatches
+Fashion
+  ├── Men's Clothing
+  ├── Women's Clothing
+  ├── Footwear
+  └── Accessories
+Home & Kitchen
+  ├── Furniture
+  ├── Kitchen Appliances
+  └── Home Décor
+Beauty & Personal Care
+  ├── Skincare
+  ├── Haircare
+  └── Makeup
+Sports & Outdoors
+  ├── Gym Equipment
+  ├── Sportswear
+  └── Outdoor Gear
+```
+
+---
+
+### ⬛ PHASE 3 — Authentication + Layout (~12 files)
+
+**What to build:**
+
+**NextAuth.js v5 Configuration (`lib/auth.ts`):**
+- **Credentials Provider:**
+  - Email + Password login
+  - Password hashed with bcryptjs (12 rounds)
+  - Validate credentials against User table
+  - Return user with id, name, email, role, avatar
+- **Google OAuth Provider:**
+  - Using GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
+  - Auto-create User record on first Google login
+  - Default role: CUSTOMER
+- **Phone OTP Provider (mock):**
+  - Accept any phone number
+  - Fixed OTP code: `123456` in development
+  - Verify against this fixed code
+- **Session Strategy:** JWT
+- **JWT Callback:** Include user.id, user.role, user.rewardCoins in token
+- **Session Callback:** Expose id, role, rewardCoins in session.user
+- **Prisma Adapter** for account linking
+
+**API Route:** `app/api/auth/[...nextauth]/route.ts`
+
+**Auth Pages:**
+- `/login` — Clean centered card. Email/password form. Google OAuth button ("Continue with Google"). Phone OTP tab. "Remember me" checkbox. "Forgot password?" link. "New to Kartigo? Create an account" link. Brand imagery/illustration on side (desktop).
+- `/register` — Name, email, phone (+91 prefix), password, confirm password. Referral code field (optional, pre-filled from URL `?ref=CODE`). Terms acceptance checkbox. On submit: create user, if referralCode provided → create Referral record + award bonus coins.
+- `/forgot-password` — Email input → mock "reset link sent" flow (or real Resend email if configured).
+
+**Middleware (`middleware.ts`):**
+```
+Route protection rules:
+  /account/*    → requires authenticated user (any role)
+  /seller/*     → requires SELLER role
+  /admin/*      → requires ADMIN role
+  /checkout     → requires authenticated user
+  /api/admin/*  → requires ADMIN role
+  /api/seller/* → requires SELLER role (coming in Phase 8)
+  
+  All other routes → public
+  
+  Unauthorized → redirect to /login?callbackUrl=<original-url>
+  Wrong role → redirect to / with error toast
+```
+
+**Layout Components:**
+
+**Header (`components/layout/Header.tsx`):**
+- **Top bar (desktop):** Announcement bar with scrolling offers
+- **Main bar:**
+  - Logo (SVG "Kartigo" text + shopping bag icon)
+  - Location/PIN code selector (like Amazon — "Deliver to Mumbai 400001")
+  - **Search bar** (centered, prominent):
+    - Full-width input with search icon + category dropdown
+    - On focus: show recent searches + trending searches
+    - On type (debounced 300ms): show autocomplete suggestions (product names with thumbnails + prices, category matches, brand matches)
+    - On submit: navigate to `/search?q=...`
+  - **User icon** with dropdown:
+    - Logged out: "Hello, Sign in" → dropdown with Login/Register buttons
+    - Logged in: "Hello, [Name]" → dropdown with Profile, Orders, Wishlist, KartiCoins balance, Reseller Dashboard, Seller Dashboard (if SELLER), Admin Panel (if ADMIN), Logout
+  - **Wishlist** icon with count badge
+  - **Cart** icon with count badge + mini cart preview on hover (desktop)
+- **Category bar:** Horizontal nav with mega menu on hover
+  - Each category → shows subcategories + featured brands + promotional image in mega menu
+
+**MegaMenu (`components/layout/MegaMenu.tsx`):**
+- Multi-column dropdown
+- Category → subcategories list + featured brands + promo image
+- Links to category pages
+
+**MobileNav (`components/layout/MobileNav.tsx`):**
+- Bottom sticky navigation bar with 4-5 icons: Home, Categories, Cart (with badge), Account, More
+- Categories → opens full-screen category browser
+- Replaces header nav on mobile
+
+**Footer (`components/layout/Footer.tsx`):**
+- 4-column layout: About Kartigo, Help & Support, Policies, Connect
+- Payment method icons (Visa, Mastercard, RuPay, UPI, Razorpay)
+- "© 2025 Kartigo. All rights reserved."
+- Social media links
+
+---
+
+### ⬛ PHASE 4 — Storefront Pages (~15 files)
+
+**What to build:**
+
+**4A. Homepage (`/` or `/(storefront)/page.tsx`)**
+
+Build the homepage as a dense, content-rich, scroll-heavy experience. Every section populated with real seed data via server components.
+
+**Sections (top to bottom, in this exact order):**
+
+1. **Hero Carousel** — 5-6 auto-rotating slides (3s interval). Embla Carousel. Each slide: full-width banner image, headline text, subheadline, CTA button. Dots + arrow navigation. Swipe on mobile. Slides link to category/product/sale pages. Use vibrant, colorful placeholder images (Unsplash sale-style images or generated).
+
+2. **Category Strip** — Horizontal scrollable row of circular category icons (image + label below). 10-12 categories. Each links to `/category/[slug]`. Flipkart-style.
+
+3. **⚡ Flash Deals Section** — Title "⚡ Flash Deals" with live `CountdownTimer` (HH:MM:SS). Horizontal scrollable product cards. Each card: product image, title (2 lines truncated), selling price, MRP strikethrough, discount % badge (green), "X% claimed" progress bar, "Add to Cart" quick button. "View All" link.
+
+4. **Deal of the Day** — Large featured product card. Hero-size image. Countdown timer. Price breakdown. Trust badges row. "Buy Now" CTA. One product, prominently displayed.
+
+5. **Curated Collections (Myntra-style)** — "Trending Now", "Editor's Picks", "New Arrivals". Fashion-forward grid layout with lifestyle imagery. Lookbook-style cards. Each card: full-bleed image, overlay text (collection name), "Shop Now" CTA. Links to filtered product listing.
+
+6. **Top Brands** — Grid of brand cards. Each card: brand logo centered, "Up to X% off" overlay. Links to `/brand/[slug]`.
+
+7. **"Best in Electronics"** — Section title + horizontal scroll or 4-6 product cards in a row. Product cards with standard layout. "View All" link. Repeat for "Fashion Picks", "Home Essentials" (3 category-based product sections).
+
+8. **Earn with Kartigo (Reseller Banner)** — Full-width CTA section. "Share Products. Earn Commission." 3-step visual explainer (Browse → Share → Earn). "Start Reselling" button → links to reseller signup or account/reseller page.
+
+9. **Recently Viewed** — If user has browsing history (localStorage), show horizontal product scroll. Otherwise hide.
+
+**4B. Category / Listing Page (`/category/[slug]`)**
+
+**Left Sidebar — Filters:**
+- Price range slider (min/max with manual input fields)
+- Brand checkboxes (with search input to filter brand list)
+- Rating filter (4★ & above, 3★ & above, etc.)
+- Discount filter (10%+ off, 20%+ off, etc.)
+- Size selector (S, M, L, XL, XXL — for fashion categories)
+- Color swatches (visual circles)
+- Availability toggle (In Stock only)
+- Active filters shown as removable chips
+- "Clear All" button
+
+**Main Content:**
+- Breadcrumbs (Home > Electronics > Smartphones)
+- Category title + total product count ("Showing 1-40 of 2,847 results")
+- Sort dropdown: Relevance, Price: Low→High, Price: High→Low, Newest, Popularity, Rating
+- View toggle: Grid (default, 4-col desktop / 2-col mobile) / List
+- Product cards (ProductCard component)
+- Pagination (numbered pages + "Next") or "Load More" button
+
+**Mobile adaptations:**
+- Filters → bottom sheet (Sheet component from shadcn)
+- Sort → sticky bar at top
+- 2-column product grid
+- Smaller product cards
+
+**4C. Product Detail Page (`/product/[slug]`)**
+
+This is the most critical page. It must be **information-dense yet beautifully organized.**
+
+**Left Column (55-60%, desktop):**
+- **Image Gallery:**
+  - Main image (large, ~500x500)
+  - Thumbnail strip below (or left side)
+  - Click thumbnail → swap main image
+  - Zoom on hover (CSS transform scale on mousemove, or lens effect)
+  - 4-6 images per product
+  - Fullscreen lightbox on click (optional)
+
+**Right Column (40-45%, desktop):**
+- **Product title** (H1, Poppins font)
+- **Brand name** (linked to `/brand/[slug]`)
+- **Rating line:** ★★★★☆ 4.2 | 1,847 ratings & 312 reviews (clickable, scrolls to reviews)
+- **Price block:**
+  - Selling price: **₹1,299** (large, bold, Inter)
+  - MRP: ~~₹2,499~~ (strikethrough, muted)
+  - Discount: **48% off** (green badge)
+  - "Inclusive of all taxes"
+- **EMI info:** "From ₹217/month. EMI options available" (expandable)
+- **KartiCoins:** "Earn 65 KartiCoins with this purchase" (with coin icon)
+- **Delivery Estimate:**
+  - PIN code input field with "Check" button
+  - Before input: "Enter PIN code to check delivery date"
+  - After input: "Delivery by Thursday, Jul 3" + "FREE Delivery" (green) or "₹49 delivery"
+  - Use mock logic: parse PIN, show delivery 3-5 days from today
+- **Seller Info:** "Sold by: TechMart (4.5★)" — linked to seller page. "Fulfilled by Kartigo" badge if applicable.
+- **Variant Selection:**
+  - Color swatches (visual circles with border on selected)
+  - Size buttons (S/M/L/XL — highlighted on selected, grayed if out of stock)
+  - Quantity dropdown (1-10, capped at stock)
+  - Price/stock updates when variant changes
+- **Action Buttons:**
+  - "🛒 Add to Cart" (large, primary indigo button)
+  - "⚡ Buy Now" (large, coral secondary button) → adds to cart + redirects to checkout
+  - ♡ Wishlist toggle (heart icon)
+  - 📤 Share button (dropdown: WhatsApp, Facebook, Twitter, Copy Link)
+  - **"💰 Share & Earn ₹XX"** (Meesho-style, for logged-in users) → generates unique ShareLink → shows share options
+- **Trust Badges Row:** 🔒 Secure Payment | 🔄 7-Day Returns | ✅ Genuine Product | 🚚 Free Delivery
+- **Offers Section** (expandable cards):
+  - "Bank Offer: 10% instant discount on HDFC Bank Cards"
+  - "Coupon: Use KARTIGO10 for extra ₹100 off" (copy button)
+  - "Partner Offer: Get ₹50 cashback on Paytm wallet"
+
+**Below the Fold (tabs or sections):**
+- **Description** — Rich HTML content. Feature bullets + paragraph text + embedded images.
+- **Specifications** — Clean key-value table (Brand, Model, Color, Material, Weight, Warranty, etc.)
+- **Reviews Section:**
+  - Aggregate rating: large number + star visualization + 5-star breakdown bar chart (like Amazon)
+  - Filter reviews: All Stars, 5★, 4★, 3★, 2★, 1★, With Photos
+  - Sort reviews: Most Recent, Most Helpful
+  - Review cards: user name, "Verified Purchase" badge, star rating, title, body, review photos (clickable), "Helpful? 👍 Yes (count) / 👎 No" buttons, date
+  - "Write a Review" button (only for users who purchased — check order history)
+  - Review form: star rating picker, title, body (min 20 chars), photo upload (up to 5)
+- **Q&A Section:** "Have a question?" input. Mock existing Q&A entries.
+- **Similar Products** carousel
+- **"Customers who bought this also bought"** carousel
+
+**4D. Search Results (`/search?q=...`)**
+
+- Search query displayed: `Showing results for "wireless earbuds"`
+- Spell correction: `Did you mean "wireless earphones"?` (mock)
+- Same filter sidebar as category page
+- Same product grid with sort options
+- If no results: friendly empty state with illustration + "Try different keywords" + popular categories
+- URL-based state (all filters/sort/page in querystring for shareability)
+
+**4E. Brand Storefront (`/brand/[slug]`)**
+
+- Hero banner (brand banner image, brand logo overlay, tagline)
+- Brand description paragraph
+- Featured collections from this brand (if fashion brand — Myntra-style lookbook cards)
+- Full product listing with all filters (same as category page, but pre-filtered to this brand)
+
+---
+
+### ⬛ PHASE 5 — Cart + Checkout + Payments (~10 files)
+
+**What to build:**
+
+**5A. Zustand Cart Store (`store/cartStore.ts`)**
+- State: items[], couponCode, couponDiscount
+- Actions: addItem, removeItem, updateQuantity, clearCart, applyCoupon, removeCoupon
+- Persistence:
+  - Authenticated users → sync with database cart (via API calls)
+  - Guest users → localStorage persistence
+  - On login → merge localStorage cart into DB cart
+- Computed: itemCount, subtotal, total
+
+**5B. Cart Page (`/cart`)**
+- Full-page layout
+- Each cart item row: product image (clickable → product page), title, variant info, seller name, unit price, quantity selector (+/- with min 1, max = stock), line total, "Remove" button, "Move to Wishlist" link, delivery estimate text
+- **Price Breakdown Sidebar (sticky on desktop):**
+  - Price (X items): ₹XXXX
+  - Discount: -₹XXX
+  - Coupon discount: -₹XXX (shown only if coupon applied)
+  - Delivery charges: FREE / ₹XX
+  - KartiCoins applied: -₹XX (toggle to apply available coins)
+  - **Total Amount: ₹XXXX** (bold, large)
+  - "You will save ₹1,247 on this order" (green savings banner)
+  - KartiCoins to earn: "+XX KartiCoins" preview
+  - "Place Order" button → redirect to /checkout
+- **Coupon section:** Input field + "Apply" button. Show applied coupon with "Remove" option. Show validation errors.
+- **Stock warnings:** "Only 2 left!" (amber badge on item)
+- **Out of stock:** Item grayed out with "Out of Stock — Remove" prompt
+- **Suggestions:** "You might also like" product carousel below cart
+- **Empty cart:** Illustration + "Your cart is empty" + "Continue Shopping" CTA + trending products
+
+**5C. Wishlist Page (`/wishlist`)**
+- Grid of saved products
+- Each card: image, title, price (with discount), "Add to Cart" button, "Remove" × button
+- Sort: Date Added, Price Low→High, Price High→Low
+- Empty state: "Your wishlist is empty" + "Explore Now" CTA
+
+**5D. Checkout Page (`/checkout`)**
+
+Multi-step checkout (accordion or stepper UI):
+
+**Step 1 — Delivery Address:**
+- Saved addresses as selectable cards (radio selection)
+- Selected address highlighted with indigo border
+- "Add New Address" button → inline form:
+  - Full Name, Phone (+91), Address Line 1, Address Line 2 (optional), City, State, PIN Code (6 digits), Landmark (optional), Type (Home/Work/Other)
+  - PIN code auto-fill: when 6-digit PIN entered, auto-populate City and State (mock with a lookup table of 10-20 common PIN codes)
+- "Deliver Here" button → proceed to next step
+
+**Step 2 — Order Summary:**
+- Compact item list (image, title, qty, price per item)
+- Full price breakdown (same as cart sidebar)
+- Coupon input (if not applied in cart)
+- KartiCoins toggle ("Use 200 KartiCoins for ₹200 off")
+- Editable (link back to cart)
+
+**Step 3 — Payment:**
+- **Razorpay (default):** "Pay with Razorpay" button
+  - On click:
+    1. POST `/api/payment/create-order` → creates Razorpay order on server
+    2. Opens Razorpay checkout popup on frontend (using `razorpay` JS SDK)
+    3. User completes payment in popup
+    4. On success callback → POST `/api/payment/verify` with razorpayOrderId, razorpayPaymentId, razorpaySignature
+    5. Server verifies signature using `crypto.createHmac`
+    6. On valid → create Order in database, clear cart, credit KartiCoins, redirect to confirmation
+    7. On invalid → show error, allow retry
+- **Cash on Delivery:** Radio option. Show "₹40 COD fee will be added" warning. On select, "Place Order" button (no Razorpay popup). Create order with paymentMethod: COD, paymentStatus: PENDING.
+- **Razorpay configuration (lib/razorpay.ts):**
+  ```typescript
+  // Server-side Razorpay instance
+  import Razorpay from 'razorpay'
+  const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID!,
+    key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  })
+  ```
+- **Razorpay popup options:**
+  ```typescript
+  {
+    key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+    amount: totalInPaise, // amount in paise (₹100 = 10000)
+    currency: "INR",
+    name: "Kartigo",
+    description: `Order #${orderNumber}`,
+    order_id: razorpayOrderId,
+    handler: async (response) => { /* verify */ },
+    prefill: { name, email, contact },
+    theme: { color: "#3730A3" }
+  }
+  ```
+- **Webhook handler (`/api/payment/webhook`):**
+  - Verify webhook signature using RAZORPAY_WEBHOOK_SECRET
+  - Handle events: `payment.captured`, `payment.failed`, `refund.processed`
+  - Update order paymentStatus accordingly
+
+**5E. Order Confirmation (`/order/confirmation/[id]`)**
+- "🎉 Order Placed Successfully!" heading with confetti animation (canvas-confetti or custom CSS)
+- Order number (large, copyable)
+- Estimated delivery date
+- Order summary (items, total)
+- KartiCoins earned on this order
+- "Continue Shopping" button
+- "Track Your Order" button
+- "Share your purchase and earn coins!" prompt (for resellers)
+
+---
+
+### ⬛ PHASE 6 — Account Dashboard (~10 files)
+
+**What to build:**
+
+Account pages use a shared layout with sidebar navigation (`AccountSidebar.tsx`):
+Sidebar links: Profile, My Orders, Wishlist, Addresses, KartiCoins, My Reviews, Referrals, Reseller, Notifications, Settings
+
+**6A. Profile (`/account/profile`)**
+- View/edit: name, email, phone, avatar (image upload to Cloudinary)
+- Change password form (current password, new password, confirm)
+- Email and phone shown as verified/unverified badges
+
+**6B. My Orders (`/account/orders`)**
+- Tab filter: All, Active, Delivered, Cancelled, Returned
+- Order cards: order number, date, items preview (thumbnails), status badge (color-coded), total amount
+- "Track Order" button → navigates to order detail
+- "Reorder" button → adds same items to cart
+- Click card → expands or navigates to `/account/orders/[id]`
+
+**6C. Order Detail (`/account/orders/[id]`)**
+- **Order Timeline (`OrderTimeline.tsx`):**
+  - Visual stepper showing: PLACED → CONFIRMED → PACKED → SHIPPED → OUT_FOR_DELIVERY → DELIVERED
+  - Current step: highlighted with animation (pulsing dot)
+  - Each step: timestamp + description ("Your order has been shipped via BlueDart")
+  - Completed steps: green checkmark
+  - Future steps: grayed out
+- Tracking number (if shipped)
+- Item list with per-item status (for multi-seller orders)
+- Delivery address
+- Payment details
+- Actions: "Cancel Order" (if PLACED/CONFIRMED), "Return/Replace" (if DELIVERED within 7 days), "Need Help?" link
+- Invoice download (generate a simple PDF or styled HTML page)
+
+**6D. Wishlist (`/account/wishlist`)** — Same as /wishlist page
+
+**6E. Addresses (`/account/addresses`)**
+- List of saved addresses as cards
+- Default address marked with badge
+- Each card: "Edit" button, "Delete" button, "Set as Default" button
+- "Add New Address" → same form as checkout
+
+**6F. KartiCoins (`/account/rewards`)**
+- **Balance display:** Large coin icon + balance number (e.g., "🪙 450 KartiCoins")
+- "= ₹450 value" subtitle
+- **Transaction history table:** Date, Type (Earned/Redeemed/Expired/Bonus), Coins (+/-), Description, Order # (if applicable)
+- **"How to earn more" section:**
+  - ✅ Earn 5 coins per ₹100 spent
+  - ✅ Get 50 coins on signup
+  - ✅ Get 100 coins per successful referral
+  - ✅ Get 10 coins per review written
+  - ⚠️ Coins expire after 12 months
+
+**6G. My Reviews (`/account/reviews`)**
+- **"Awaiting Review" section:** Products from delivered orders that haven't been reviewed. Each card: product image, title, "Write a Review" button.
+- **"My Past Reviews" section:** Reviews written by user. Each: product, star rating, review text, date, "Edit" / "Delete" buttons.
+
+**6H. Referrals (`/account/referrals`)**
+- **Referral code display:** Large, copyable code with "Copy" button
+- **Share buttons:** WhatsApp, Email, Copy Link (link format: `kartigo.com/?ref=CODE`)
+- **Referral message:** "Invite friends and earn 100 KartiCoins when they make their first purchase!"
+- **Stats cards:** Total invited, Successful signups, Total coins earned
+- **Referral history table:** Friend's name (masked), signup date, status (Pending/Completed), reward (coins earned)
+
+**6I. Notifications (`/account/notifications`)**
+- Notification list: icon, title, message, timestamp, read/unread status
+- Types: Order updates, price drops, back-in-stock, promotional
+- "Mark all as read" button, individual "Mark read" on click
+- Delete notification button
+- Empty state if no notifications
+
+**6J. Settings (`/account/settings`)**
+- Email notification preferences (toggles for: order updates, promotions, price alerts)
+- Account deletion ("Delete my account" with confirmation dialog)
+- Logout from all devices
+
+---
+
+### ⬛ PHASE 7 — Admin Panel (~12 files)
+
+**What to build:**
+
+Admin layout with `AdminSidebar.tsx`: Dashboard, Users, Products, Orders, Categories, Brands, Sellers, Promotions, Reviews, Settings.
+
+All admin pages require ADMIN role (enforced in middleware).
+
+**7A. Dashboard (`/admin/page.tsx`)**
+- **Stats cards row:** Total Users, Total Orders, Total Revenue (₹), Total Products, Active Sellers, Pending Seller Applications
+- **Revenue chart** (Recharts — line chart, daily/weekly/monthly toggle)
+- **Orders chart** (Recharts — bar chart, daily orders)
+- **Recent orders table** (last 10 orders — order #, customer, total, status, date)
+- **Recent user signups** (last 5)
+
+**7B. Users (`/admin/users`)**
+- **Data table** with columns: Avatar, Name, Email, Phone, Role, Status, Joined, Actions
+- Search by name/email
+- Filter by role (CUSTOMER/SELLER/ADMIN)
+- Actions dropdown: View Details, Change Role, Ban/Unban
+- Click row → user detail panel (order history, reviews, etc.)
+
+**7C. Products (`/admin/products`)**
+- Data table: Image, Title, Category, Seller, Price, Stock, Status, Actions
+- Search + filter (category, seller, status, price range)
+- Actions: View, Edit, Approve/Reject (for seller-submitted products), Toggle Featured, Delete
+- Bulk actions: select multiple → activate/deactivate
+
+**7D. Orders (`/admin/orders`)**
+- Data table: Order #, Customer, Items, Total, Payment Status, Order Status, Date, Actions
+- Advanced filters: status, date range, payment status, seller, amount range
+- Click → full order detail view
+- Actions: Update status, Issue refund, Add notes
+
+**7E. Categories (`/admin/categories`)**
+- Tree view or nested list showing parent → children hierarchy
+- Each category: name, slug, image, product count, status, sort order
+- Add / Edit category form (name, slug auto-generated, description, image upload, parent selector)
+- Delete (with "X products will be affected" warning)
+- Drag-and-drop reordering (or manual sort order input)
+
+**7F. Brands (`/admin/brands`)**
+- Data table: Logo, Name, Slug, Product Count, Featured, Status, Actions
+- Add / Edit brand form (name, slug, logo upload, banner upload, description, featured toggle)
+- Delete
+
+**7G. Sellers (`/admin/sellers`)**
+- **Pending Applications** section: seller applications awaiting approval. Each: store name, user info, GST, PAN, applied date. Approve/Reject buttons.
+- **Active Sellers** table: store name, owner, products, sales, rating, commission rate, status
+- Click → seller detail view with performance metrics
+- Edit commission rate per seller
+
+**7H. Promotions (`/admin/promotions`)**
+
+Three sub-tabs: **Coupons**, **Flash Sales**, **Banners**
+
+**Coupons:**
+- Table: Code, Type, Value, Min Order, Usage (used/limit), Validity, Status
+- Create coupon form: code, type (PERCENTAGE/FIXED/FREE_SHIPPING), value, min order amount, max discount, usage limit, valid from/to, applicable categories (multi-select), applicable products (search + select)
+- Edit / Deactivate / Delete
+
+**Flash Sales:**
+- Table: Title, Start, End, Products, Status
+- Create flash sale: title, banner image upload, start/end datetime pickers, product selector (search + add with sale price + quantity limit per product)
+- Edit / Deactivate / Delete
+
+**Banners:**
+- Grid of banner cards (desktop image, mobile image, link, position, status)
+- Add banner: image upload (desktop + mobile), title, link URL, position (HERO/SIDEBAR/CATEGORY/POPUP), active toggle, date range
+- Drag-and-drop sort ordering
+- Edit / Delete
+
+**7I. Reviews (`/admin/reviews`)**
+- Tab: All, Pending Approval, Flagged/Reported
+- Table: Product, User, Rating, Review Text (truncated), Photos, Helpful, Reports, Status, Date
+- Actions: Approve, Reject, Delete
+
+**7J. Settings (`/admin/settings`)**
+- **Platform settings:** Site name, maintenance mode toggle, announcement bar text
+- **Reward rules:** Earn rate (coins per ₹100), redemption rate (₹ per coin), signup bonus, referral bonus, review bonus
+- **Shipping:** Default shipping cost, free shipping threshold
+- **Tax:** Tax percentage
+- **COD:** COD fee amount, COD enabled toggle
+
+---
+
+### ⬛ PHASE 8 — Seller Dashboard + Reseller/Social Commerce (~10 files)
+
+**What to build:**
+
+**8A. Seller Onboarding**
+
+**Landing page (`/sell-on-kartigo`):**
+- Hero section: "Sell on Kartigo — Reach millions of customers"
+- Benefits: "Zero listing fee", "Easy inventory management", "Fast payouts"
+- 3-step process: Register → List Products → Start Selling
+- "Start Selling" CTA → `/seller/register`
+
+**Registration (`/seller/register`):**
+- Requires authenticated user (CUSTOMER role)
+- Form: Store Name, Store Description, GST Number, PAN Number, Bank Account Holder Name, Account Number, IFSC Code
+- On submit: create Seller record with status PENDING, notify admin
+- Show "Application submitted! We'll review within 24 hours" confirmation
+
+**Approval flow:** Admin approves → Seller.applicationStatus = APPROVED, isActive = true, User.role changed to SELLER
+
+**8B. Seller Dashboard**
+
+Seller layout with `SellerSidebar.tsx`: Overview, Products, Orders, Store, Finances, Reviews.
+
+**Overview (`/seller/page.tsx`):**
+- Stats cards: Revenue (this month), Orders (today), Pending Shipments, Total Products, Average Rating
+- Revenue chart (Recharts — last 30 days)
+- Recent orders table (last 10)
+
+**Products (`/seller/products`):**
+- Table: Image, Title, Price, Stock, Status (Active/Draft/Out of Stock), Actions
+- "Add New Product" button → `/seller/products/new`
+
+**Add/Edit Product (`/seller/products/new` and `/seller/products/[id]/edit`):**
+- Comprehensive product form:
+  - Title, Description (rich text editor or textarea), Category (nested select), Brand (select or create)
+  - Base Price, Selling Price (auto-calculate discount %)
+  - SKU, Stock, Weight
+  - Images (multi-upload to Cloudinary, drag to reorder, set thumbnail)
+  - Tags (comma-separated input)
+  - Attributes (dynamic key-value pairs: color, material, etc.)
+  - Variants (add variant section: name, SKU, price override, stock, images)
+  - SEO: Meta Title, Meta Description
+  - "Save as Draft" / "Submit for Review" (goes to admin approval)
+
+**Orders (`/seller/orders`):**
+- Table showing only orders containing this seller's products
+- Columns: Order #, Customer, Item(s), Amount, Item Status, Date
+- Actions: Confirm → Pack → Ship (enter tracking number)
+- Each action updates OrderItem.itemStatus
+
+**Store (`/seller/store`):**
+- Edit: Store Name, Description, Logo (upload), Banner (upload)
+- Preview: "View my store" link → `/brand/[storeSlug]` (or seller storefront page)
+
+**Finances (`/seller/finances`):**
+- **Earnings overview:** Total Earned, This Month, Pending (from undelivered orders), Available for Withdrawal
+- **Commission breakdown:** "Platform commission: X% → You receive: (100-X)%"
+- **Transaction table:** Order #, Product, Sale Amount, Commission, Your Earnings, Status, Date
+- **Payout section:** Bank details display. "Request Withdrawal" button (mock — sets a "withdrawal requested" state, shows "Processing" status)
+
+**Reviews (`/seller/reviews`):**
+- All reviews on this seller's products
+- Respond to reviews (reply text)
+
+**8C. Reseller / Social Commerce (Meesho-style)**
+
+**"Share & Earn" Button (on every product page, for logged-in users):**
+1. User clicks "Share & Earn ₹XX" on any product
+2. System generates a unique `ShareLink`:
+   - URL: `kartigo.com/product/[slug]?ref=[uniqueCode]`
+   - Stored in ShareLink table with userId, productId, uniqueCode
+3. Modal shows:
+   - Generated link (copyable)
+   - Share buttons: WhatsApp (with pre-filled message), Facebook, Twitter, Copy
+   - "You'll earn ₹XX when someone buys through your link"
+4. WhatsApp message template: "🔥 Check out this amazing deal on Kartigo! [Product Title] for just ₹[Price]! [Link]"
+
+**Tracking (when someone visits a shared link):**
+- On page load: detect `?ref=` in URL
+- POST `/api/referrals/track` → increment ShareLink.clicks
+- Store refCode in cookie/localStorage (persist for 7 days)
+- If that visitor purchases:
+  - Increment ShareLink.conversions
+  - Calculate commission (% of sale, configurable per category in admin settings)
+  - Credit commission to ShareLink.commissionEarned
+  - Create RewardTransaction for the reseller
+  - Notify reseller
+
+**Reseller Dashboard (`/account/reseller`):**
+- **Earnings overview cards:** Total Earned (lifetime), This Month, Pending
+- **Shared products table:** Product Image, Title, Your Link, Clicks, Conversions, Commission Earned
+- **Generate share link:** Search for any product → generate link → get sharing options
+- **Withdrawal section:** "Request Withdrawal" (mock). Show minimum withdrawal threshold (₹100).
+- **Commission rates info:** Table showing commission % per category
+
+---
+
+## SECTION 5 — UI/UX DESIGN SPECIFICATIONS
+
+### Animations & Micro-interactions (implement ALL of these)
+
+| Trigger | Animation |
+|---------|-----------|
+| Page transition | Fade-in on route change (CSS transition or Framer Motion) |
+| Async content loading | Skeleton pulse animation (shadcn Skeleton) |
+| Add to Cart button | Brief morph: text changes to "✓ Added!" (green, 1.5s), then reverts |
+| Wishlist heart | Fill animation on click (scale 1.0 → 1.3 → 1.0) |
+| Quantity +/- | Smooth number transition |
+| Flash sale timer | Digit flip animation (or at minimum, smooth CSS transitions) |
+| Notification badge | Subtle bounce when count increments |
+| Product image gallery | Smooth slide/fade transitions between images |
+| Filter expand/collapse | Smooth height transition |
+| Toast notifications | Slide in from top-right, auto-dismiss after 4s |
+| Product card hover | Subtle scale(1.02) + shadow elevation increase |
+| Hero carousel | Smooth horizontal slide with easing |
+| Order confirmation | Canvas confetti burst (2-3 seconds) |
+| Star rating hover | Stars fill progressively on hover |
+
+### Responsive Breakpoints (Tailwind defaults)
+
+| Breakpoint | Width | Layout Notes |
+|-----------|-------|--------------|
+| Mobile | < 640px | Single column, bottom nav, swipe gestures, filters in bottom sheet |
+| Tablet | 640-1024px | 2 columns, collapsible sidebar |
+| Desktop | 1024px+ | Full layout, mega menu, hover states, mini cart |
+| Large | 1280px+ | Max-width container (1280px), expanded grids |
+
+### Mobile-First Requirements
+- Sticky bottom navigation bar (Home, Categories, Cart, Account)
+- Sticky "Add to Cart" bar on product detail page (mobile only)
+- Swipe gestures on image galleries
+- Filter bottom sheet (not sidebar)
+- Touch targets minimum 44x44px
+- No horizontal scroll anywhere (audit!)
+- WebP images with responsive srcset
+
+---
+
+## SECTION 6 — SEO & PERFORMANCE
+
+### SEO (implement all)
+- Dynamic `generateMetadata()` on every page
+- Product pages: title = product title, description = truncated product description, OG image = product thumbnail
+- JSON-LD structured data: Product schema (name, price, availability, rating), BreadcrumbList, Organization (homepage), FAQ (/faq)
+- `next-sitemap` configuration for sitemap.xml + robots.txt
+- Canonical URLs on all pages
+- Alt text on every `<Image>` tag
+- Semantic HTML: `<header>`, `<main>`, `<nav>`, `<section>`, `<article>`, `<footer>`
+
+### Performance
+- Server Components by default. Client Components only where interactivity needed.
+- `next/image` for all images (lazy loading, WebP, blur placeholder)
+- `next/font` for Google Fonts (no layout shift)
+- Route-level code splitting (automatic with App Router)
+- ISR (Incremental Static Regeneration) for homepage, category pages, product pages
+- Prisma: select only needed fields, proper indexes, pagination
+- Debounced search (300ms)
+- Minimal client-side bundle (analyze with `@next/bundle-analyzer` if needed)
+
+---
+
+## SECTION 7 — STATIC PAGES (build with real content)
+
+These are NOT placeholder pages. Write real, professional content.
+
+| Page | Route | Content |
+|------|-------|---------|
+| About | `/about` | Company story, mission, values, team section (mock team members with avatar images) |
+| Contact | `/contact` | Contact form (name, email, subject, message → mock submission), email, phone, address, map placeholder |
+| FAQ | `/faq` | Accordion with 15+ real Q&As covering: ordering, payment, shipping, returns, refunds, seller onboarding, KartiCoins, reselling, account management |
+| Privacy Policy | `/privacy-policy` | Real privacy policy text (data collection, usage, cookies, third parties, rights) |
+| Terms | `/terms` | Real terms of service (acceptance, account rules, purchasing, intellectual property, liability) |
+| Return Policy | `/return-policy` | Return conditions, timeline (7 days), refund process, non-returnable items, exchange policy |
+| Sell on Kartigo | `/sell-on-kartigo` | Seller onboarding landing page (covered in Phase 8) |
+
+---
+
+## SECTION 8 — ENVIRONMENT VARIABLES
+
+Create `.env.example` at project root:
+
+```env
+# ═══════════════════════════════════════
+# DATABASE
+# ═══════════════════════════════════════
+DATABASE_URL="postgresql://postgres:password@db.xxxx.supabase.co:5432/postgres"
+
+# ═══════════════════════════════════════
+# AUTHENTICATION (NextAuth.js)
+# ═══════════════════════════════════════
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="generate-with-openssl-rand-base64-32"
+
+# Google OAuth
+GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# ═══════════════════════════════════════
+# PAYMENTS (Razorpay)
+# ═══════════════════════════════════════
+RAZORPAY_KEY_ID="rzp_test_xxxxxxxxxxxx"
+RAZORPAY_KEY_SECRET="your-razorpay-test-key-secret"
+RAZORPAY_WEBHOOK_SECRET="your-razorpay-webhook-secret"
+NEXT_PUBLIC_RAZORPAY_KEY_ID="rzp_test_xxxxxxxxxxxx"
+
+# ═══════════════════════════════════════
+# FILE STORAGE (Cloudinary)
+# ═══════════════════════════════════════
+CLOUDINARY_CLOUD_NAME="your-cloud-name"
+CLOUDINARY_API_KEY="your-api-key"
+CLOUDINARY_API_SECRET="your-api-secret"
+
+# ═══════════════════════════════════════
+# EMAIL (Resend)
+# ═══════════════════════════════════════
+RESEND_API_KEY="re_xxxxxxxxxxxx"
+
+# ═══════════════════════════════════════
+# APP
+# ═══════════════════════════════════════
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NEXT_PUBLIC_APP_NAME="Kartigo"
+```
+
+---
+
+## SECTION 9 — QUALITY CHECKLIST
+
+**Before you consider this project complete, verify EVERY item:**
+
+### Functionality
+- [ ] Homepage renders all 9+ sections with real seed data
+- [ ] Category pages load correct products with all filters working
+- [ ] Product detail page: gallery, variants, price, delivery estimate, reviews, seller info — ALL work
+- [ ] Search returns relevant results with autocomplete dropdown
+- [ ] Cart: add, update qty, remove, coupon apply/remove, KartiCoins toggle — ALL work
+- [ ] Wishlist: add, remove, move to cart — ALL work
+- [ ] Checkout: address selection → payment → Razorpay popup → order confirmation — FULL FLOW works
+- [ ] Razorpay test payment processes successfully (use test card 4111 1111 1111 1111)
+- [ ] Order tracking page shows correct timeline
+- [ ] User registration with referral code works (coins awarded)
+- [ ] Login with email/password works
+- [ ] Login with Google OAuth works
+- [ ] Password change works
+- [ ] Reviews: only verified purchasers can write, photo upload works, helpful voting works
+- [ ] KartiCoins: earn on purchase, display balance, redeem at checkout, transaction history
+- [ ] Share & Earn: generates unique link, tracks clicks, tracks conversions
+- [ ] Flash sale countdown timers count down in real-time
+- [ ] Coupons validate correctly (min amount, expiry, usage limits)
+- [ ] Seller registration + admin approval flow works
+- [ ] Seller CRUD products with image upload works
+- [ ] Seller order management (confirm/pack/ship) works
+- [ ] Admin dashboard shows real metrics
+- [ ] Admin can manage users, products, orders, categories, brands, sellers, promotions
+
+### UI/UX
+- [ ] Mobile responsive on ALL pages (test at 375px width)
+- [ ] Desktop polished (test at 1440px)
+- [ ] Loading states (skeletons) on all async content
+- [ ] Error states (form validation errors shown clearly, API errors handled gracefully)
+- [ ] Empty states (empty cart, wishlist, search, orders)
+- [ ] All animations smooth (no jank)
+- [ ] Typography consistent (Poppins headings, Inter body)
+- [ ] Color palette (#3730A3, #FB7185) used consistently
+- [ ] All interactive elements have hover states
+- [ ] Toast notifications for success/error actions
+
+### Technical
+- [ ] TypeScript strict mode, ZERO `any` types
+- [ ] No `console.log` in production code
+- [ ] All API routes return proper HTTP status codes (200, 201, 400, 401, 403, 404, 500)
+- [ ] Auth guards on all protected routes (middleware.ts)
+- [ ] Prisma queries optimized (no N+1, select only needed fields)
+- [ ] No hardcoded secrets
+- [ ] Seed script runs without errors (`npx prisma db seed`)
+- [ ] `npm run build` completes without errors
+- [ ] `npm run lint` passes
+- [ ] `.env.example` contains ALL required variables
+- [ ] Project deploys to Vercel without errors
+
+---
+
+## FINAL WORDS
+
+This document contains:
+- **8 build phases** in exact execution order
+- **16+ database models** with every field and relation
+- **60+ API routes** explicitly listed
+- **14+ pages** specified element-by-element
+- **80+ source files** in the project tree
+- **50+ seed data entries** with exact requirements
+- **35+ quality checklist items** for self-verification
+- **Complete Razorpay integration flow** with webhook handling
+- **Full auth system** with Google OAuth + credentials + phone OTP
+- **Three dashboard systems** (Customer Account + Seller + Admin)
+- **Social commerce system** with share-and-earn tracking
+- **Reward system** with earn/redeem/expire lifecycle
+
+There is no ambiguity. There are no open questions. Every decision has been made. Every feature has been specified.
+
+**Build Kartigo exactly as described. Build it like your career depends on the outcome. Build it like 10 million Indian shoppers will use it next month.**
+
+**Because if you build it right — they will.** 🚀
+
+---
+
+*End of Kartigo Builder Prompt — v2.0 Final*
+*Specification coverage: 9 sections • 8 phases • 80+ files • 60+ APIs • 50+ features • Zero ambiguity*

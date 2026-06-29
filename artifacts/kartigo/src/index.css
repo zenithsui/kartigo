@@ -1,0 +1,238 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-border: var(--primary-border);
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-border: var(--secondary-border);
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted-border: var(--muted-border);
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-border: var(--accent-border);
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-border: var(--destructive-border);
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-primary-border: var(--sidebar-primary-border);
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-accent-border: var(--sidebar-accent-border);
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  --font-sans: var(--app-font-sans);
+  --font-serif: var(--app-font-serif);
+  --font-mono: var(--app-font-mono);
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-sm: 0.875rem;
+  --text-sm--line-height: calc(1.25 / 0.875);
+  --text-base: 1rem;
+  --text-base--line-height: calc(1.5 / 1);
+  --text-lg: 1.125rem;
+  --text-lg--line-height: calc(1.75 / 1.125);
+  --text-xl: 1.25rem;
+  --text-xl--line-height: calc(1.75 / 1.25);
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: calc(2 / 1.5);
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: calc(2.25 / 1.875);
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: calc(2.5 / 2.25);
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1;
+  --text-7xl: 4.5rem;
+  --text-7xl--line-height: 1;
+  --text-8xl: 6rem;
+  --text-8xl--line-height: 1;
+  --text-9xl: 8rem;
+  --text-9xl--line-height: 1;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --app-font-sans: "Inter", sans-serif;
+  --app-font-serif: "Outfit", serif;
+  --app-font-mono: ui-monospace, monospace;
+  --radius: 0.625rem;
+
+  /* Kartigo color palette — Deep Purple + Orange */
+  --background: 0 0% 98%;
+  --foreground: 260 10% 10%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 260 10% 10%;
+  --card-border: 260 15% 91%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 260 10% 10%;
+  --popover-border: 260 15% 91%;
+
+  /* Deep Purple #6C3CE1 */
+  --primary: 258 73% 55%;
+  --primary-foreground: 0 0% 100%;
+  --primary-border: hsl(258 73% 48%);
+
+  /* Orange #FF6B35 */
+  --secondary: 21 100% 60%;
+  --secondary-foreground: 0 0% 100%;
+  --secondary-border: hsl(21 100% 53%);
+
+  --muted: 260 15% 95%;
+  --muted-foreground: 260 8% 46%;
+  --muted-border: hsl(260 15% 88%);
+
+  --accent: 258 73% 96%;
+  --accent-foreground: 258 73% 40%;
+  --accent-border: hsl(258 73% 88%);
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --destructive-border: hsl(0 84% 53%);
+
+  --border: 260 15% 91%;
+  --input: 260 15% 91%;
+  --ring: 258 73% 55%;
+
+  --chart-1: 258 73% 55%;
+  --chart-2: 21 100% 60%;
+  --chart-3: 142 76% 36%;
+  --chart-4: 198 93% 60%;
+  --chart-5: 45 93% 47%;
+
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 260 10% 10%;
+  --sidebar-border: 260 15% 91%;
+  --sidebar-primary: 258 73% 55%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-primary-border: hsl(258 73% 48%);
+  --sidebar-accent: 258 73% 96%;
+  --sidebar-accent-foreground: 258 73% 40%;
+  --sidebar-accent-border: hsl(258 73% 88%);
+  --sidebar-ring: 258 73% 55%;
+}
+
+.dark {
+  --background: 260 20% 7%;
+  --foreground: 260 5% 95%;
+
+  --card: 260 20% 10%;
+  --card-foreground: 260 5% 95%;
+  --card-border: 260 15% 18%;
+
+  --popover: 260 20% 10%;
+  --popover-foreground: 260 5% 95%;
+  --popover-border: 260 15% 18%;
+
+  --primary: 258 73% 65%;
+  --primary-foreground: 0 0% 100%;
+  --primary-border: hsl(258 73% 55%);
+
+  --secondary: 21 100% 60%;
+  --secondary-foreground: 0 0% 100%;
+  --secondary-border: hsl(21 100% 53%);
+
+  --muted: 260 15% 16%;
+  --muted-foreground: 260 8% 60%;
+  --muted-border: hsl(260 15% 22%);
+
+  --accent: 258 30% 20%;
+  --accent-foreground: 258 73% 75%;
+  --accent-border: hsl(258 30% 25%);
+
+  --destructive: 0 62% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --destructive-border: hsl(0 62% 48%);
+
+  --border: 260 15% 18%;
+  --input: 260 15% 18%;
+  --ring: 258 73% 65%;
+
+  --chart-1: 258 73% 65%;
+  --chart-2: 21 100% 60%;
+  --chart-3: 142 76% 46%;
+  --chart-4: 198 93% 60%;
+  --chart-5: 45 93% 57%;
+
+  --sidebar: 260 20% 8%;
+  --sidebar-foreground: 260 5% 95%;
+  --sidebar-border: 260 15% 18%;
+  --sidebar-primary: 258 73% 65%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-primary-border: hsl(258 73% 55%);
+  --sidebar-accent: 258 30% 20%;
+  --sidebar-accent-foreground: 258 73% 75%;
+  --sidebar-accent-border: hsl(258 30% 25%);
+  --sidebar-ring: 258 73% 65%;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Outfit", sans-serif;
+  }
+}
+
+/* Kartigo custom utilities */
+.kartigo-gradient {
+  background: linear-gradient(135deg, hsl(258 73% 55%), hsl(21 100% 60%));
+}
+.kartigo-text-gradient {
+  background: linear-gradient(135deg, hsl(258 73% 55%), hsl(21 100% 60%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.product-card {
+  @apply bg-card border border-card-border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}

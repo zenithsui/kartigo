@@ -1,0 +1,140 @@
+I need you to do a complete final preparation of Kartigo before I deploy it. Don't ask me questions — just do everything listed below and give me download-ready files at the end.
+
+🔧 Step 1 — Fix Everything
+Go through the entire codebase right now:
+
+Find and fix every bug, every error, every warning
+Fix every broken import, missing module, wrong path
+Fix every TypeScript error
+Fix every API route that might fail
+Fix every Prisma query that could break
+Fix every missing await, wrong type, undefined variable
+Check every page renders without crashing
+Check every form submits correctly
+Check every button does what it should
+
+Don't skip anything. Go file by file if needed.
+
+⚙️ Step 2 — Set Up Everything
+Configure the entire project for production:
+Neon Database:
+
+Set DATABASE_URL in .env.example with correct Neon Postgres format
+Make sure prisma/schema.prisma has provider = "postgresql"
+Add ?sslmode=require&connect_timeout=30 to connection string
+Make sure Prisma client is initialized correctly for serverless
+Add /api/health route that pings DB and returns { status: "ok" }
+
+Auth:
+
+NEXTAUTH_SECRET placeholder in .env.example
+NEXTAUTH_URL set to https://your-domain.vercel.app as placeholder
+Magic link + email/password both working
+
+Cloudinary:
+
+CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET in .env.example
+Image upload working in admin panel and seller dashboard
+
+Resend:
+
+RESEND_API_KEY and EMAIL_FROM in .env.example
+All email templates working — welcome, magic link, order confirmation, password reset
+
+Razorpay:
+
+RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET in .env.example
+Checkout flow working in test mode
+Webhook route /api/webhooks/razorpay working
+
+Vercel:
+
+Make sure next.config.js is production ready
+No hardcoded localhost URLs anywhere
+All environment variables referenced from process.env
+vercel.json configured if needed
+
+
+📦 Step 3 — Seed Data
+Make sure prisma/seed.ts creates:
+
+1 Owner account — owner@kartigo.com / Owner@123
+1 Admin account — admin@kartigo.com / Admin@123
+1 Seller account — seller@kartigo.com / Seller@123
+5 Categories — Electronics, Fashion, Beauty, Home, Sports
+50 realistic products with images, prices, variants
+3 Homepage banners
+3 Working coupons — SAVE10, FIRST50, KARTIGO20
+10 fake reviews across products
+
+
+📋 Step 4 — Create .env.example
+Final .env.example with every single variable:
+env# Database (Neon)
+DATABASE_URL=postgresql://user:pass@ep-xxx.ap-southeast-1.aws.neon.tech/kartigo?sslmode=require&connect_timeout=30
+
+# Auth (NextAuth)
+NEXTAUTH_SECRET=generate-with-openssl-rand-base64-32
+NEXTAUTH_URL=https://your-domain.vercel.app
+
+# Google OAuth (optional)
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
+
+# Razorpay
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+RAZORPAY_WEBHOOK_SECRET=
+
+# Resend (Email)
+RESEND_API_KEY=
+EMAIL_FROM=noreply@kartigo.com
+
+# Analytics (optional)
+NEXT_PUBLIC_GA_MEASUREMENT_ID=
+
+📖 Step 5 — Create README.md
+Write a complete README with:
+
+What Kartigo is
+Full tech stack list
+Step by step local setup instructions
+How to set up Neon, Cloudinary, Resend, Razorpay
+How to run prisma db push and prisma db seed
+How to deploy on Vercel
+All login credentials (owner, admin, seller)
+All working coupon codes
+
+
+📁 Step 6 — Give Me Download Links
+When everything above is done:
+
+Zip the entire project as kartigo-final.zip
+Give me the download link
+Also give me a GitHub-ready version — .gitignore properly set, no .env file included, only .env.example
+
+
+✅ Final Check Before Zipping
+Before giving me the download link, confirm:
+✅ Zero TypeScript errors
+✅ Zero broken imports
+✅ Every page loads without crash
+✅ Admin panel works at /admin
+✅ Owner panel works at /owner
+✅ Seller dashboard works at /seller
+✅ Cart + checkout flow complete
+✅ Razorpay test mode working
+✅ All emails configured
+✅ Seed data ready
+✅ .env.example complete
+✅ README.md complete
+✅ Vercel deployment ready
+✅ GitHub ready (no secrets exposed)
+Don't give me the zip until every single checkbox above is confirmed.
+This is going live. Make it perfect. 🚀

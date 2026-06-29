@@ -1,0 +1,1458 @@
+# 🚀 KARTIGO — The Build Prompt
+
+> **Read this entire document before writing a single line of code. Every sentence exists for a reason. Every detail is intentional. This is not a wishlist — it is a blueprint.**
+
+---
+
+## SECTION 0 — MINDSET & NON-NEGOTIABLES
+
+You are about to build **Kartigo** — India's most complete shopping platform. Not a clone. Not a template. Not a portfolio piece. A *real product* that fuses the DNA of **Amazon, Flipkart, Meesho, and Ajio** into a single, cohesive, production-grade e-commerce experience.
+
+### The Standard You Must Hold
+
+- **Every feature you build must work end-to-end.** If a button exists, it does something. If a page exists, it's fully functional. If a flow exists, it completes. No placeholders. No "coming soon." No skeleton screens that never load real data. No `TODO` comments. No `lorem ipsum`. No empty modals.
+- **This ships tomorrow.** Write every component, every API route, every database query as if a real user will interact with it within 24 hours. Because that's the plan.
+- **Quality is not optional.** If you find yourself about to cut a corner — stop. Re-read this section. Then build it properly.
+- **You are building for India.** Prices in ₹ (INR). Addresses with PIN codes. Phone numbers with +91. Payment via Razorpay. Delivery estimates in Indian geography context. Hindi/English sensibility in UX copy.
+
+### What Failure Looks Like
+
+- A homepage that looks like a Bootstrap template
+- Product pages without reviews, ratings, delivery estimates, or seller info
+- A cart that doesn't persist across sessions
+- An admin panel that can't actually manage products
+- Authentication that's half-implemented
+- Search that only matches exact titles
+- Mobile experience that's an afterthought
+
+**If any of the above describes what you build, you have failed. Do not let that happen.**
+
+---
+
+## SECTION 1 — PRODUCT VISION
+
+**Kartigo** = Amazon's catalog depth & trust infrastructure + Flipkart's deal-driven excitement & gamification + Meesho's social commerce & reseller economics + Ajio's fashion-forward design & brand storytelling.
+
+These are not four separate feature sets bolted together. They are **one unified experience** where:
+
+- A user can browse curated fashion lookbooks (Ajio) →
+- Discover a flash sale with countdown timer (Flipkart) →
+- Read 47 verified reviews with photo evidence (Amazon) →
+- Share the product with their WhatsApp group to earn commission (Meesho) →
+- Checkout with Razorpay and earn reward coins (Flipkart SuperCoins) →
+- Track their order with real-time status updates (Amazon)
+
+**That's one user journey. That's Kartigo.**
+
+---
+
+## SECTION 2 — TECHNOLOGY STACK
+
+### Core Framework
+```
+Framework:        Next.js 14+ (App Router)
+Language:         TypeScript (strict mode, no `any` types)
+Styling:          Tailwind CSS 3.4+
+UI Components:    shadcn/ui as the base component library
+State Management: Zustand for client state, React Query (TanStack Query) for server state
+Forms:            React Hook Form + Zod validation
+```
+
+### Backend & Data
+```
+Database:         PostgreSQL via Supabase (or Neon)
+ORM:              Prisma
+Authentication:   NextAuth.js v5 (Auth.js) with Credentials + Google + Phone OTP
+File Storage:     Supabase Storage or Cloudinary for product images
+Search:           Implement full-text search via PostgreSQL tsvector or integrate Meilisearch
+Payments:         Razorpay (test mode keys, but fully integrated flow)
+Email:            Resend or Nodemailer for transactional emails
+```
+
+### Deployment & Infrastructure
+```
+Hosting:          Vercel-ready (next.config optimized for Vercel deployment)
+Environment:      .env.example with every required variable documented
+Edge Functions:   Use Next.js middleware for auth guards, geo-detection
+Image CDN:        Next.js <Image> with Cloudinary/Supabase loader
+```
+
+### Code Quality
+```
+Linting:          ESLint with strict Next.js config
+Formatting:       Prettier
+Type Safety:      End-to-end type safety from DB → API → Frontend via Prisma generated types
+File Structure:   Feature-based organization inside /app directory
+```
+
+---
+
+## SECTION 3 — DATABASE SCHEMA (Prisma Models)
+
+Design your Prisma schema to support the following entities. This is the minimum — extend as needed.
+
+### Core Entities
+
+```prisma
+// Users & Authentication
+User {
+  id, email, phone, name, avatar, role (BUYER | SELLER | ADMIN),
+  passwordHash, emailVerified, phoneVerified,
+  addresses[], orders[], reviews[], wishlist[], cart,
+  referralCode (unique), referredBy,
+  rewardCoins (Int, default 0),
+  createdAt, updatedAt
+}
+
+Address {
+  id, userId, fullName, phone, addressLine1, addressLine2,
+  city, state, pincode, landmark, isDefault, type (HOME | WORK | OTHER)
+}
+
+// Product Catalog
+Product {
+  id, title, slug (unique), description, richDescription (HTML),
+  basePrice, sellingPrice, discount (%),
+  images[] (array of URLs), thumbnail,
+  categoryId, subcategoryId, brandId, sellerId,
+  stock, sku, weight, dimensions,
+  tags[], attributes (JSON — color, size, material, etc.),
+  variants[] (relation),
+  averageRating, totalReviews, totalSold,
+  isActive, isFeatured, isFlashSale,
+  flashSalePrice, flashSaleStart, flashSaleEnd,
+  metaTitle, metaDescription,
+  createdAt, updatedAt
+}
+
+ProductVariant {
+  id, productId, name (e.g., "Blue / XL"),
+  sku, price, stock, images[],
+  attributes (JSON — specific variant attributes)
+}
+
+Category {
+  id, name, slug, description, image, icon,
+  parentId (self-relation for subcategories),
+  children[], products[],
+  isActive, sortOrder
+}
+
+Brand {
+  id, name, slug, logo, bannerImage, description,
+  isActive, isFeatured,
+  products[]
+}
+
+// Commerce
+Cart {
+  id, userId (nullable for guest carts), sessionId,
+  items[], couponCode, discount,
+  createdAt, updatedAt
+}
+
+CartItem {
+  id, cartId, productId, variantId,
+  quantity, priceAtAdd
+}
+
+Order {
+  id, orderNumber (unique, human-readable like "KRT-20250629-XXXX"),
+  userId, items[],
+  subtotal, discount, shippingCost, tax, total,
+  couponCode, couponDiscount,
+  shippingAddressId, billingAddressId,
+  paymentMethod, paymentStatus (PENDING | PAID | FAILED | REFUNDED),
+  razorpayOrderId, razorpayPaymentId, razorpaySignature,
+  orderStatus (PLACED | CONFIRMED | PACKED | SHIPPED | OUT_FOR_DELIVERY | DELIVERED | CANCELLED | RETURNED),
+  trackingNumber, estimatedDelivery,
+  rewardCoinsEarned, rewardCoinsUsed,
+  notes,
+  createdAt, updatedAt
+}
+
+OrderItem {
+  id, orderId, productId, variantId, sellerId,
+  title, image, price, quantity,
+  itemStatus (mirrors order status but per-item for multi-seller orders)
+}
+
+// Reviews & Ratings
+Review {
+  id, userId, productId, orderId,
+  rating (1-5), title, body,
+  images[] (user-uploaded review photos),
+  isVerifiedPurchase,
+  helpfulCount, reportCount,
+  isApproved,
+  createdAt
+}
+
+// Seller / Multi-Vendor
+Seller {
+  id, userId, storeName, storeSlug, storeLogo, storeBanner,
+  description, gstNumber, panNumber,
+  bankAccountName, bankAccountNumber, bankIfsc,
+  isVerified, isActive,
+  rating, totalSales, totalProducts,
+  commissionRate (%), balance,
+  products[], orders[],
+  createdAt
+}
+
+// Social Commerce (Meesho-style)
+Referral {
+  id, referrerId (User), referredUserId,
+  referralCode, status (PENDING | COMPLETED),
+  rewardAmount, rewardType (COINS | CASHBACK),
+  createdAt
+}
+
+ShareLink {
+  id, userId (the reseller), productId,
+  uniqueCode, clicks, conversions,
+  commissionEarned,
+  createdAt
+}
+
+// Promotions
+Coupon {
+  id, code (unique), description,
+  type (PERCENTAGE | FIXED | FREE_SHIPPING),
+  value, minOrderAmount, maxDiscount,
+  usageLimit, usedCount,
+  validFrom, validTo, isActive,
+  applicableCategories[], applicableProducts[]
+}
+
+FlashSale {
+  id, title, bannerImage,
+  startTime, endTime,
+  isActive, products[]
+}
+
+Banner {
+  id, title, image, mobileImage,
+  link, position (HERO | SIDEBAR | CATEGORY | POPUP),
+  isActive, sortOrder,
+  startDate, endDate
+}
+
+// Reward System (Flipkart SuperCoins equivalent)
+RewardTransaction {
+  id, userId, type (EARNED | REDEEMED | EXPIRED),
+  coins, description,
+  orderId (nullable),
+  createdAt
+}
+```
+
+---
+
+## SECTION 4 — PAGE-BY-PAGE SPECIFICATION
+
+Every page below must be fully built, fully styled, fully functional. No exceptions.
+
+---
+
+### 4.1 — HOMEPAGE (`/`)
+
+The homepage is the storefront. It must feel alive, exciting, and dense with content — like walking into a massive mall during a festival sale.
+
+**Layout (top to bottom):**
+
+1. **Announcement Bar** — Scrolling ticker with offers ("Free delivery on orders above ₹499" / "Use code KARTIGO10 for 10% off")
+
+2. **Navigation Header**
+   - Logo (placeholder text "KARTIGO" in a bold, custom font — stylized, not plain text)
+   - Search bar (prominent, centered, with autocomplete dropdown showing products, categories, and suggestions)
+   - Location/PIN code selector (like Amazon)
+   - Icons: User Account, Wishlist (with count badge), Cart (with count badge + mini preview on hover), Notifications bell
+   - Category mega-menu on hover (with images, subcategories, featured brands)
+
+3. **Hero Carousel**
+   - Full-width, auto-rotating banners (5-6 slides)
+   - Each slide: vibrant promotional image, headline, CTA button
+   - Flipkart-style "Big Billion Days" / sale event banners
+   - Smooth transitions, dots + arrows navigation, swipe on mobile
+   - Use generated placeholder images that look like real sale banners
+
+4. **Category Strip**
+   - Horizontal scrollable row of circular category icons (Electronics, Fashion, Home, Beauty, Sports, etc.)
+   - Each icon links to its category page
+   - Styled like Flipkart's category bar
+
+5. **Flash Sale Section**
+   - Section title: "⚡ Flash Deals" with a live countdown timer (HH:MM:SS)
+   - Horizontal scrollable product cards showing: image, title, selling price, MRP with strikethrough, discount %, "X left" urgency indicator
+   - Progress bar showing "67% claimed" style
+   - "View All" link
+
+6. **Deal of the Day**
+   - Large featured product card with hero image
+   - Countdown timer, price breakdown, "Buy Now" CTA
+   - Trust badges: "Genuine Product", "Easy Returns", "Secure Payment"
+
+7. **Curated Collections (Ajio-style)**
+   - "Trending Now", "Editor's Picks", "New Arrivals"
+   - Fashion-forward grid layout with lifestyle imagery
+   - Lookbook-style presentation — models wearing outfits, styled product shots
+   - Each collection card links to a filtered product listing
+
+8. **Top Brands**
+   - Grid of brand logos in cards
+   - "Up to X% off" overlay on each
+   - Links to brand storefront pages
+
+9. **Category-wise Product Grids**
+   - Multiple sections: "Best in Electronics", "Fashion Picks", "Home Essentials"
+   - Each section: 4-6 product cards in a row, "View All" link
+   - Product card: image, title (2 lines, truncated), rating stars + count, selling price, MRP strikethrough, discount badge, delivery estimate ("Delivery by Jul 2")
+
+10. **Social Proof / Reseller Section (Meesho-style)**
+    - "Earn with Kartigo" banner
+    - "Share products, earn commission" explainer with 3-step visual
+    - CTA: "Start Reselling" → links to reseller signup/dashboard
+
+11. **Recently Viewed** (if user has browsing history)
+    - Horizontal scroll of recently viewed products
+
+12. **Footer**
+    - Multi-column: About, Help, Policies, Seller Hub, Social Links
+    - Payment method icons (Visa, Mastercard, UPI, Razorpay)
+    - "© 2025 Kartigo. All rights reserved."
+    - Download app badges (placeholder)
+
+---
+
+### 4.2 — CATEGORY / LISTING PAGE (`/category/[slug]`)
+
+**Left Sidebar — Filters:**
+- Price range (slider + manual input)
+- Brand (checkbox list with search)
+- Rating (4★ & above, 3★ & above, etc.)
+- Discount (10% off or more, 20% off or more, etc.)
+- Size (S, M, L, XL, XXL — for fashion)
+- Color (swatches)
+- Availability (in stock only)
+- Seller rating
+- Delivery speed ("Get it by tomorrow")
+- **Active filters shown as removable chips at top**
+- **"Clear All" button**
+
+**Main Content:**
+- Breadcrumb navigation
+- Category title + product count ("Showing 1–40 of 2,847 results")
+- Sort dropdown: Relevance, Price Low→High, Price High→Low, Newest, Popularity, Rating
+- View toggle: Grid (default) / List
+- Product cards (same spec as homepage cards)
+- Infinite scroll OR pagination (implement pagination with "Load More" button)
+
+**Mobile:**
+- Filters collapse into a bottom sheet / slide-out drawer
+- Sticky sort bar at top
+- 2-column product grid
+
+---
+
+### 4.3 — SEARCH RESULTS (`/search?q=...`)
+
+- Mirrors category page layout
+- Search term displayed prominently: `Showing results for "wireless earbuds"`
+- Spell correction suggestion: `Did you mean "wireless earbuds"?`
+- Filter sidebar identical to category page
+- If no results: friendly empty state with suggestions and popular categories
+- Search history (recent searches) in search dropdown
+- Trending searches in search dropdown
+- Product, category, and brand results grouped
+
+---
+
+### 4.4 — PRODUCT DETAIL PAGE (`/product/[slug]`)
+
+This is the most important page on the site. It must be **dense with information** yet **beautifully organized**.
+
+**Left Column (60%):**
+- Image gallery: Main image (large) + thumbnail strip below/left
+- Image zoom on hover (like Amazon)
+- 4-6 product images
+- User-uploaded review photos accessible here too
+
+**Right Column (40%):**
+- Product title (H1)
+- Brand name (linked to brand page)
+- Rating: ★★★★☆ 4.2 (1,847 ratings & 312 reviews) — clickable, scrolls to reviews
+- Selling price: **₹1,299** ~~₹2,499~~ **48% off** (green badge)
+- EMI info: "From ₹217/month" (expandable)
+- Reward coins: "Earn 65 KartiCoins with this purchase"
+- **Delivery Estimate:**
+  - PIN code input field
+  - "Enter PIN code to check delivery date"
+  - After entry: "Delivery by Thursday, Jul 3" + "FREE delivery" or shipping cost
+- **Seller Info:**
+  - "Sold by: TechMart (4.5★)" — linked to seller page
+  - "Fulfilled by Kartigo" badge (if applicable)
+- **Variant Selection:**
+  - Color swatches (visual)
+  - Size selector (if applicable)
+  - Quantity selector (dropdown, max based on stock)
+- **Action Buttons:**
+  - "Add to Cart" (primary, large)
+  - "Buy Now" (secondary, large)
+  - Wishlist heart icon
+  - Share button (copy link, WhatsApp, Facebook, Twitter)
+  - **"Share & Earn ₹XX"** button for resellers (Meesho-style)
+- **Trust Badges Row:**
+  - 🔒 Secure Payment | 🔄 7-Day Returns | ✅ Genuine Product | 🚚 Free Delivery
+- **Offers:**
+  - Bank offer: "10% off on HDFC cards" (expandable)
+  - Coupon: "Use KARTIGO10 for extra ₹100 off" (copy button)
+  - Partner offer details
+
+**Below the Fold:**
+- **Product Description** — Rich HTML content with images, feature bullets, specifications table
+- **Specifications Table** — Key-value pairs in a clean table (Brand, Model, Color, Material, Weight, etc.)
+- **Reviews Section:**
+  - Overall rating breakdown (5-star bar chart like Amazon)
+  - Filter reviews by: All Stars, 5★, 4★, 3★, 2★, 1★, With Photos
+  - Sort reviews by: Most Recent, Most Helpful
+  - Individual review cards:
+    - User name + "Verified Purchase" badge
+    - Star rating + Review title
+    - Review text
+    - Review photos (clickable gallery)
+    - "Helpful?" Yes (count) / No (count) buttons
+    - Date
+  - "Write a Review" button (only for users who purchased this product)
+- **Q&A Section:**
+  - "Have a question?" input
+  - Listed questions with answers
+- **Similar Products** carousel
+- **"Customers who bought this also bought"** carousel
+- **Recently Viewed** carousel
+
+---
+
+### 4.5 — CART (`/cart`)
+
+- Full-page cart layout
+- Each cart item: image, title, variant info, seller name, unit price, quantity selector (with +/- and stock limit), subtotal, remove button, "Move to Wishlist" link, delivery estimate
+- **Price Breakdown Sidebar:**
+  - Subtotal (X items)
+  - Discount
+  - Coupon discount (with "Apply Coupon" input + apply button)
+  - Delivery charges (or "FREE" with green text)
+  - KartiCoins used (toggle to apply available coins)
+  - **Order Total** (bold, large)
+  - KartiCoins to be earned on this order
+  - "Place Order" CTA button
+- **Savings highlight:** "You will save ₹1,247 on this order" (green banner)
+- **Stock warnings:** "Only 2 left in stock!" (amber)
+- **Related product suggestions** below cart
+- **Empty cart state:** Illustration + "Your cart is empty" + "Continue Shopping" CTA + trending products
+
+---
+
+### 4.6 — WISHLIST (`/wishlist`)
+
+- Grid of saved products
+- Each card: product image, title, price, "Add to Cart" button, "Remove" button
+- "Share Wishlist" option
+- Sort by: Date Added, Price
+- Empty state: "Your wishlist is empty. Start exploring!" + category links
+
+---
+
+### 4.7 — CHECKOUT (`/checkout`)
+
+Multi-step or accordion-style checkout:
+
+**Step 1 — Address**
+- Saved addresses as selectable cards
+- "Add New Address" form (full address form with PIN code auto-fill for city/state)
+- Address type tags: Home, Work, Other
+
+**Step 2 — Order Summary**
+- Compact list of items being ordered
+- Price breakdown (mirrors cart sidebar)
+- Coupon application
+- KartiCoins toggle
+
+**Step 3 — Payment**
+- Payment methods:
+  - Razorpay integration (Cards, UPI, Net Banking, Wallets)
+  - Cash on Delivery (with ₹40 COD fee clearly shown)
+  - KartiCoins partial payment
+- Razorpay checkout popup on "Pay Now"
+- On success: redirect to order confirmation
+- On failure: show error, allow retry
+
+**Step 4 — Order Confirmation (`/order/confirmation/[id]`)**
+- "Order Placed Successfully! 🎉" with confetti animation
+- Order number, estimated delivery
+- Order summary
+- KartiCoins earned
+- "Continue Shopping" + "Track Order" CTAs
+- Reseller prompt: "Share your purchase and earn coins!"
+
+---
+
+### 4.8 — ORDER TRACKING (`/orders/[id]`)
+
+- Visual stepper/timeline showing order journey:
+  - Order Placed → Confirmed → Packed → Shipped → Out for Delivery → Delivered
+  - Each step: timestamp, description
+  - Current step highlighted with animation
+- Tracking number (if shipped) — clickable mock link
+- Item details
+- Delivery address
+- Payment details
+- Actions: "Cancel Order" (if eligible), "Return/Replace" (if delivered), "Need Help?"
+- Invoice download (PDF generation)
+
+---
+
+### 4.9 — USER ACCOUNT DASHBOARD (`/account`)
+
+Sidebar navigation with these pages:
+
+1. **Profile** (`/account/profile`)
+   - View/edit name, email, phone, avatar
+   - Change password
+
+2. **Addresses** (`/account/addresses`)
+   - List, add, edit, delete addresses
+   - Set default
+
+3. **Orders** (`/account/orders`)
+   - Tabbed: All, Active, Delivered, Cancelled, Returned
+   - Order cards with: order number, date, items preview, status badge, total, "Track" / "Reorder" buttons
+   - Click to expand to full order detail
+
+4. **Wishlist** (`/account/wishlist`) — same as /wishlist
+
+5. **KartiCoins** (`/account/rewards`)
+   - Balance display (large, prominent)
+   - Transaction history: earned, redeemed, expired
+   - "How to earn more" explainer
+   - Redeem options
+
+6. **Reviews** (`/account/reviews`)
+   - Products awaiting review (from delivered orders)
+   - Past reviews (editable)
+
+7. **Referrals** (`/account/referrals`)
+   - Unique referral code + share buttons
+   - Referral stats: invites sent, signups, earnings
+   - History table
+
+8. **Reseller Dashboard** (`/account/reseller`) — Meesho-style
+   - Earnings overview
+   - Shared products + their performance (clicks, conversions)
+   - Generate share links for any product
+   - Withdrawal request (mock)
+   - Commission rate info
+
+9. **Notifications** (`/account/notifications`)
+   - Order updates, price drops, back-in-stock, promotional
+   - Mark as read, delete
+
+10. **Settings** (`/account/settings`)
+    - Email preferences
+    - Privacy settings
+    - Delete account (with confirmation)
+
+---
+
+### 4.10 — SELLER DASHBOARD (`/seller`)
+
+Accessible only to users with SELLER role. Full multi-vendor management panel.
+
+1. **Overview/Home**
+   - Revenue chart (daily/weekly/monthly)
+   - Orders today, pending shipments, total products
+   - Recent orders list
+
+2. **Products** (`/seller/products`)
+   - Table/list of all products with: image, title, price, stock, status (active/draft/out of stock)
+   - Add new product (full form with rich text editor, image upload, variant management, pricing, SEO fields)
+   - Edit, duplicate, delete products
+   - Bulk actions
+
+3. **Orders** (`/seller/orders`)
+   - Orders containing this seller's products
+   - Status management: Confirm → Pack → Ship (enter tracking number)
+   - Order detail view
+
+4. **Store Profile** (`/seller/store`)
+   - Edit store name, logo, banner, description
+   - Store performance metrics
+
+5. **Finances** (`/seller/finances`)
+   - Earnings overview
+   - Commission breakdown
+   - Payout history
+   - Bank details management
+
+6. **Reviews** (`/seller/reviews`)
+   - All reviews on seller's products
+   - Response capability
+
+---
+
+### 4.11 — ADMIN PANEL (`/admin`)
+
+Accessible only to ADMIN role users. Full platform control.
+
+1. **Dashboard**
+   - Platform-wide metrics: total users, orders, revenue, GMV
+   - Charts: revenue over time, order volume, user growth
+   - Quick stats cards
+
+2. **Users** (`/admin/users`)
+   - User table with search, filter (role, status, date)
+   - View/edit user details, change role, ban/unban
+   - User activity log
+
+3. **Products** (`/admin/products`)
+   - All products across all sellers
+   - Approve/reject seller-submitted products
+   - Featured product management
+   - Bulk import/export (CSV)
+
+4. **Orders** (`/admin/orders`)
+   - All orders platform-wide
+   - Advanced filters (status, date range, seller, amount)
+   - Order detail view with full history
+
+5. **Categories** (`/admin/categories`)
+   - CRUD for categories and subcategories
+   - Drag-and-drop reordering
+   - Category image management
+
+6. **Brands** (`/admin/brands`)
+   - CRUD for brands
+   - Brand storefront management
+
+7. **Sellers** (`/admin/sellers`)
+   - Seller applications (approve/reject)
+   - Seller performance metrics
+   - Commission rate management
+
+8. **Promotions** (`/admin/promotions`)
+   - Coupons: create, edit, deactivate
+   - Flash sales: create with product selection + timing
+   - Banners: upload, position, schedule
+
+9. **Reviews** (`/admin/reviews`)
+   - Flagged/reported reviews
+   - Approve/reject pending reviews
+
+10. **Settings** (`/admin/settings`)
+    - Platform settings (site name, maintenance mode, etc.)
+    - Tax configuration
+    - Shipping rates
+    - Reward coin rules (earn rate, redemption rate)
+
+---
+
+### 4.12 — BRAND STOREFRONT (`/brand/[slug]`)
+
+- Hero banner with brand logo, tagline
+- Brand description
+- Featured collections from this brand
+- Full product listing with filters (same as category page)
+- Curated lookbook section (for fashion brands, Ajio-style)
+
+---
+
+### 4.13 — AUTHENTICATION PAGES
+
+**Login (`/login`)**
+- Email + Password
+- Phone + OTP (Indian phone number validation)
+- Google OAuth
+- "Remember me" checkbox
+- Forgot password link
+- "New to Kartigo? Create an account" link
+- Clean, centered card layout with brand imagery
+
+**Register (`/register`)**
+- Name, Email, Phone, Password, Confirm Password
+- Referral code field (optional, pre-filled if URL has `?ref=CODE`)
+- Terms acceptance checkbox
+- Email/OTP verification step
+
+**Forgot Password (`/forgot-password`)**
+- Email input → Send reset link → New password form
+
+---
+
+### 4.14 — STATIC / INFORMATIONAL PAGES
+
+Build these as complete, real pages with real content:
+
+- `/about` — Company story, mission, values, team section
+- `/contact` — Contact form + email + phone + map placeholder
+- `/faq` — Accordion FAQ (at least 15 questions covering shipping, returns, payments, seller onboarding)
+- `/privacy-policy` — Real privacy policy text
+- `/terms` — Real terms of service text
+- `/return-policy` — Return/refund policy with conditions, timeline, process
+- `/sell-on-kartigo` — Seller onboarding landing page with benefits, process steps, CTA
+
+---
+
+## SECTION 5 — FEATURE SPECIFICATIONS
+
+### 5.1 — Authentication & Authorization
+
+```
+- NextAuth.js v5 with:
+  - Credentials provider (email/password with bcrypt hashing)
+  - Google OAuth provider
+  - Phone OTP provider (mock OTP for now — use a fixed code like 123456 in dev)
+- Role-based access control (RBAC):
+  - BUYER: default role, can browse/purchase/review
+  - SELLER: can manage products, view orders for their items
+  - ADMIN: full platform access
+- Protected routes:
+  - /account/* → requires BUYER+
+  - /seller/* → requires SELLER
+  - /admin/* → requires ADMIN
+  - /checkout → requires BUYER+
+- Session persistence across tabs
+- JWT tokens with secure httpOnly cookies
+- Middleware-based route protection
+```
+
+### 5.2 — Search
+
+```
+- Full-text search using PostgreSQL tsvector/tsquery OR Meilisearch
+- Search autocomplete dropdown:
+  - Product name matches (with thumbnail + price)
+  - Category matches
+  - Brand matches
+  - Recent searches (stored in localStorage)
+  - Trending searches (hardcoded or from analytics)
+- Debounced input (300ms)
+- Search results page with full filtering capability
+- URL-based search state (querystring) for shareability
+- Search analytics tracking (what was searched, clicked)
+```
+
+### 5.3 — Cart System
+
+```
+- Persistent cart:
+  - Authenticated users: stored in database
+  - Guest users: stored in localStorage, merged on login
+- Cart operations:
+  - Add item (with variant selection)
+  - Update quantity (respect stock limits)
+  - Remove item
+  - Move to wishlist
+  - Apply coupon code
+  - Apply/toggle KartiCoins
+- Cart badge count in header (real-time)
+- Mini cart preview on hover (desktop)
+- Price recalculation on every change
+- Stock validation before checkout
+```
+
+### 5.4 — Payment Integration (Razorpay)
+
+```
+- Full Razorpay integration:
+  1. Create Razorpay order (API route: POST /api/payment/create-order)
+  2. Open Razorpay checkout popup on frontend
+  3. Handle success callback → verify signature (API route: POST /api/payment/verify)
+  4. Update order status on success
+  5. Handle failure → show error, allow retry
+- Use Razorpay TEST keys (key_id and key_secret from Razorpay test dashboard)
+- Support for:
+  - Cards (Visa, Mastercard, etc.)
+  - UPI
+  - Net Banking
+  - Wallets (Paytm, PhonePe, etc.)
+- Cash on Delivery option (toggle, with COD fee)
+- Payment status webhook handling
+- Refund flow (admin-triggered)
+```
+
+### 5.5 — KartiCoins Reward System (SuperCoins-style)
+
+```
+- Earn rate: 5 KartiCoins per ₹100 spent (configurable by admin)
+- Redemption rate: 1 KartiCoin = ₹1 discount (configurable)
+- Earn on: completed orders only (coins credited after delivery)
+- Bonus coins: sign-up bonus (50 coins), referral bonus (100 coins), review bonus (10 coins)
+- Expiry: coins expire after 12 months (track expiry date)
+- Transaction history with type, amount, description, date
+- Balance display in header (for logged-in users) and rewards page
+- Apply coins at checkout (partial payment)
+```
+
+### 5.6 — Social Commerce / Reseller System (Meesho-style)
+
+```
+- Any user can become a reseller (toggle in account settings)
+- Reseller flow:
+  1. Browse any product
+  2. Click "Share & Earn" button
+  3. Generates unique tracked link: kartigo.com/product/slug?ref=USER_CODE
+  4. Share via WhatsApp, Instagram, Facebook, copy link
+  5. When someone purchases through this link:
+     - Referrer earns commission (% of sale, configurable per category)
+     - Commission tracked in reseller dashboard
+- Share link tracking:
+  - Clicks, unique visitors, add-to-carts, purchases
+- Reseller dashboard with:
+  - Total earnings (lifetime, this month)
+  - Product-wise performance
+  - Withdrawal history (mock — show "Withdrawal requested" state)
+- WhatsApp deep link sharing: "Check out this amazing deal on Kartigo! ₹1,299 only! [link]"
+```
+
+### 5.7 — Referral System
+
+```
+- Every user gets a unique referral code on signup
+- Share referral code/link → friend signs up → both earn KartiCoins
+- Referrer: 100 coins on friend's first purchase
+- Referee: 50 coins on signup
+- Referral tracking: invited list, signup status, reward status
+- Referral link format: kartigo.com/?ref=CODE
+```
+
+### 5.8 — Flash Sales & Promotions
+
+```
+- Flash sale creation (admin):
+  - Select products, set flash sale prices
+  - Set start and end time
+  - Set quantity limit per user
+- Frontend display:
+  - Countdown timer (live, real-time)
+  - "X% claimed" progress bar
+  - "Hurry! Only Y left" urgency text
+  - Products show original price vs flash price
+- Auto-start and auto-end based on time
+- Sale-specific banners on homepage
+
+- Coupons:
+  - Percentage or fixed discount
+  - Minimum order value
+  - Maximum discount cap
+  - Usage limit (total and per-user)
+  - Date-based validity
+  - Category/product restrictions
+  - Apply at cart/checkout with validation
+```
+
+### 5.9 — Reviews & Ratings
+
+```
+- Only verified purchasers can review (check order history)
+- Review form:
+  - Star rating (1-5, required)
+  - Title (optional)
+  - Body text (required, min 20 characters)
+  - Photo upload (up to 5 images)
+- Review display:
+  - Aggregate rating with breakdown bar chart
+  - Individual reviews with user name, date, verified badge
+  - "Helpful" voting
+  - Photo reviews shown prominently
+- Admin moderation:
+  - Reported reviews queue
+  - Approve/reject
+- Seller response capability
+```
+
+### 5.10 — Multi-Vendor / Marketplace
+
+```
+- Seller onboarding:
+  - Application form (store name, GST, PAN, bank details)
+  - Admin approval workflow
+- Each product belongs to a seller
+- Orders split by seller (one order can have items from multiple sellers)
+- Each seller manages their own:
+  - Products (CRUD with approval workflow)
+  - Orders (their items only)
+  - Revenue and payouts
+- Commission system:
+  - Platform takes X% commission (configurable per category)
+  - Seller receives (100-X)% after delivery
+  - Admin manages commission rates
+- Seller storefront: public page showing seller info + their products
+- Seller ratings: aggregate from their product reviews
+```
+
+---
+
+## SECTION 6 — UI / UX DESIGN SPECIFICATIONS
+
+### Design Language
+
+```
+Color Palette:
+  Primary:       #6C3CE1 (Deep Purple — Kartigo brand)
+  Primary Dark:   #4A1FB8
+  Primary Light:  #EDE5FF
+  Secondary:     #FF6B35 (Energetic Orange — for CTAs, deals, urgency)
+  Success:       #22C55E (Green)
+  Warning:       #F59E0B (Amber)
+  Error:         #EF4444 (Red)
+  Background:    #FAFAFA (Light mode)
+  Surface:       #FFFFFF
+  Text Primary:  #111827
+  Text Secondary: #6B7280
+  Text Muted:    #9CA3AF
+
+  Dark Mode Support:
+  Background:    #0F172A
+  Surface:       #1E293B
+  Text Primary:  #F8FAFC
+
+Typography:
+  Headings:      "Outfit" from Google Fonts (bold, modern)
+  Body:          "Inter" from Google Fonts (clean, readable)
+  Monospace:     "JetBrains Mono" (for prices, codes)
+
+Spacing:         Tailwind default scale (consistent 4px base)
+Border Radius:   Rounded-lg (8px) for cards, rounded-full for buttons/badges
+Shadows:         Subtle, layered (shadow-sm for cards, shadow-lg for modals)
+```
+
+### Animations & Micro-interactions
+
+```
+- Page transitions: fade-in on route change
+- Skeleton loading: pulse animation for all async content
+- Add to cart: button morphs briefly (success state with checkmark)
+- Wishlist heart: fill animation on click
+- Quantity selector: smooth number transition
+- Flash sale timer: digits flip animation
+- Notification badge: subtle bounce on new notification
+- Image gallery: smooth slide transitions
+- Filters: smooth collapse/expand
+- Toast notifications: slide in from top-right, auto-dismiss
+- Hover effects: subtle scale (1.02) + shadow increase on product cards
+- Parallax: subtle on hero banner (desktop only)
+- Confetti: on order confirmation page
+```
+
+### Responsive Breakpoints
+
+```
+Mobile:          < 640px  (sm)   — Single column, bottom navigation
+Tablet:          640-1024px (md) — 2 columns, collapsible sidebar
+Desktop:         1024px+ (lg)    — Full layout, mega menus, hover states
+Large Desktop:   1280px+ (xl)    — Max-width container, expanded grids
+```
+
+### Mobile-Specific
+
+```
+- Bottom navigation bar (Home, Categories, Cart, Account) — sticky
+- Swipe gestures on product images
+- Pull-to-refresh (optional)
+- Filter bottom sheet (not sidebar)
+- Sticky "Add to Cart" bar on product detail page
+- Touch-optimized tap targets (min 44px)
+- Optimized images (WebP, responsive srcset)
+- No horizontal scroll (audit this!)
+```
+
+---
+
+## SECTION 7 — API ARCHITECTURE
+
+All API routes under `/app/api/`. RESTful design.
+
+```
+Authentication:
+  POST   /api/auth/register
+  POST   /api/auth/login
+  POST   /api/auth/logout
+  POST   /api/auth/forgot-password
+  POST   /api/auth/reset-password
+  POST   /api/auth/verify-otp
+  GET    /api/auth/session
+
+Products:
+  GET    /api/products                    (with search, filter, sort, paginate)
+  GET    /api/products/[slug]
+  GET    /api/products/featured
+  GET    /api/products/flash-sale
+  POST   /api/products                    (seller/admin)
+  PUT    /api/products/[id]               (seller/admin)
+  DELETE /api/products/[id]               (seller/admin)
+
+Categories:
+  GET    /api/categories
+  GET    /api/categories/[slug]
+  POST   /api/categories                  (admin)
+  PUT    /api/categories/[id]             (admin)
+  DELETE /api/categories/[id]             (admin)
+
+Cart:
+  GET    /api/cart
+  POST   /api/cart/add
+  PUT    /api/cart/update
+  DELETE /api/cart/remove/[itemId]
+  POST   /api/cart/apply-coupon
+  DELETE /api/cart/remove-coupon
+
+Wishlist:
+  GET    /api/wishlist
+  POST   /api/wishlist/add
+  DELETE /api/wishlist/remove/[productId]
+
+Orders:
+  GET    /api/orders                      (user's orders)
+  GET    /api/orders/[id]
+  POST   /api/orders                      (create order)
+  PUT    /api/orders/[id]/status           (seller/admin)
+  POST   /api/orders/[id]/cancel           (user)
+  POST   /api/orders/[id]/return           (user)
+
+Payment:
+  POST   /api/payment/create-order        (Razorpay order creation)
+  POST   /api/payment/verify              (signature verification)
+  POST   /api/payment/webhook             (Razorpay webhook)
+
+Reviews:
+  GET    /api/reviews/product/[productId]
+  POST   /api/reviews
+  PUT    /api/reviews/[id]
+  DELETE /api/reviews/[id]
+  POST   /api/reviews/[id]/helpful
+
+Users (Admin):
+  GET    /api/admin/users
+  GET    /api/admin/users/[id]
+  PUT    /api/admin/users/[id]
+  DELETE /api/admin/users/[id]
+
+Sellers:
+  GET    /api/sellers
+  GET    /api/sellers/[slug]
+  POST   /api/sellers/apply
+  PUT    /api/sellers/[id]                (admin)
+
+Referrals:
+  GET    /api/referrals
+  POST   /api/referrals/track
+
+Rewards:
+  GET    /api/rewards/balance
+  GET    /api/rewards/history
+  POST   /api/rewards/redeem
+
+Promotions:
+  GET    /api/promotions/flash-sales
+  GET    /api/promotions/coupons/validate
+  POST   /api/promotions/flash-sales      (admin)
+  POST   /api/promotions/coupons           (admin)
+
+Upload:
+  POST   /api/upload                      (image upload to Cloudinary/Supabase)
+
+Search:
+  GET    /api/search?q=...&filters=...
+  GET    /api/search/suggestions?q=...
+  GET    /api/search/trending
+```
+
+---
+
+## SECTION 8 — SEED DATA
+
+The platform must ship with realistic seed data. Not 3 products. **At least 50+ products** across multiple categories, with:
+
+```
+Categories (with subcategories):
+  - Electronics → Smartphones, Laptops, Headphones, Cameras, Smartwatches
+  - Fashion → Men's Clothing, Women's Clothing, Footwear, Accessories
+  - Home & Kitchen → Furniture, Décor, Cookware, Appliances
+  - Beauty & Personal Care → Skincare, Haircare, Makeup, Fragrances
+  - Sports & Outdoors → Gym Equipment, Sportswear, Camping
+
+Brands (10+ across categories):
+  - Electronics: Samsung, Apple, Sony, boAt, OnePlus
+  - Fashion: Levi's, Nike, H&M, Zara, FabIndia
+  - Home: Ikea, Prestige, Milton
+  - Beauty: Lakme, Nivea, Mamaearth
+
+Products:
+  - Min 50 products, evenly distributed across categories
+  - Each with: realistic Indian pricing (₹), 3-6 images (use Unsplash/Pexels URLs or generate placeholders), detailed descriptions, specifications, variants where applicable
+  - Some products marked as flash sale items
+  - Some products marked as featured
+
+Sellers (5+):
+  - With store names, descriptions, ratings
+
+Reviews (100+):
+  - Distributed across products, varying ratings
+  - Some with photos (placeholder URLs)
+  - All marked as verified purchase
+
+Users:
+  - 1 Admin account (admin@kartigo.com / Admin123!)
+  - 3 Seller accounts
+  - 5 Buyer accounts with order history
+  - Referral connections between users
+
+Orders (20+):
+  - Various statuses (placed, shipped, delivered, cancelled)
+  - Associated with user accounts
+
+Flash Sales:
+  - 2 active flash sales with countdown timers
+  - Products assigned to each
+
+Coupons:
+  - KARTIGO10: 10% off, min ₹499
+  - FIRST50: ₹50 off, first order only
+  - FREESHIP: Free shipping, min ₹999
+
+Banners:
+  - 5 homepage hero banners
+  - Category-specific banners
+```
+
+**Create a seed script** (`prisma/seed.ts`) that populates all of this data. It should be runnable with `npx prisma db seed`.
+
+---
+
+## SECTION 9 — SEO & PERFORMANCE
+
+### SEO
+
+```
+- Dynamic metadata for every page using Next.js generateMetadata()
+- Product pages: title = product name, description = truncated description, OG image = product thumbnail
+- Category pages: title = category name, description = category description
+- Structured data (JSON-LD):
+  - Product schema (name, price, availability, rating, reviews)
+  - BreadcrumbList schema
+  - Organization schema (homepage)
+  - FAQ schema (/faq page)
+- Sitemap generation (next-sitemap)
+- robots.txt
+- Canonical URLs on all pages
+- Alt text on all images
+- Semantic HTML (header, main, nav, section, article, footer)
+```
+
+### Performance
+
+```
+- Next.js App Router with:
+  - Server Components by default
+  - Client Components only where needed (interactivity)
+  - Streaming with Suspense for slow data
+  - Route-level code splitting (automatic)
+- Image optimization:
+  - next/image with lazy loading
+  - WebP format
+  - Responsive srcset
+  - Blur placeholder (blurDataURL)
+- Font optimization: next/font for Google Fonts (no layout shift)
+- Minimal client-side JavaScript
+- Database query optimization:
+  - Select only needed fields
+  - Proper indexes on frequently queried columns
+  - Pagination with cursor-based or offset
+- API response caching where appropriate
+- Static generation for: homepage (ISR), category pages (ISR), product pages (ISR with on-demand revalidation)
+```
+
+---
+
+## SECTION 10 — PROJECT STRUCTURE
+
+```
+kartigo/
+├── prisma/
+│   ├── schema.prisma
+│   ├── seed.ts
+│   └── migrations/
+├── public/
+│   ├── icons/
+│   ├── images/
+│   └── fonts/
+├── src/
+│   ├── app/
+│   │   ├── (auth)/
+│   │   │   ├── login/
+│   │   │   ├── register/
+│   │   │   └── forgot-password/
+│   │   ├── (main)/
+│   │   │   ├── page.tsx                 (homepage)
+│   │   │   ├── category/[slug]/
+│   │   │   ├── product/[slug]/
+│   │   │   ├── search/
+│   │   │   ├── cart/
+│   │   │   ├── wishlist/
+│   │   │   ├── checkout/
+│   │   │   ├── brand/[slug]/
+│   │   │   └── order/
+│   │   │       ├── confirmation/[id]/
+│   │   │       └── [id]/
+│   │   ├── account/
+│   │   │   ├── profile/
+│   │   │   ├── addresses/
+│   │   │   ├── orders/
+│   │   │   ├── wishlist/
+│   │   │   ├── rewards/
+│   │   │   ├── reviews/
+│   │   │   ├── referrals/
+│   │   │   ├── reseller/
+│   │   │   ├── notifications/
+│   │   │   └── settings/
+│   │   ├── seller/
+│   │   │   ├── page.tsx                 (dashboard)
+│   │   │   ├── products/
+│   │   │   ├── orders/
+│   │   │   ├── store/
+│   │   │   ├── finances/
+│   │   │   └── reviews/
+│   │   ├── admin/
+│   │   │   ├── page.tsx                 (dashboard)
+│   │   │   ├── users/
+│   │   │   ├── products/
+│   │   │   ├── orders/
+│   │   │   ├── categories/
+│   │   │   ├── brands/
+│   │   │   ├── sellers/
+│   │   │   ├── promotions/
+│   │   │   ├── reviews/
+│   │   │   └── settings/
+│   │   ├── about/
+│   │   ├── contact/
+│   │   ├── faq/
+│   │   ├── privacy-policy/
+│   │   ├── terms/
+│   │   ├── return-policy/
+│   │   ├── sell-on-kartigo/
+│   │   ├── api/
+│   │   │   ├── auth/
+│   │   │   ├── products/
+│   │   │   ├── categories/
+│   │   │   ├── cart/
+│   │   │   ├── wishlist/
+│   │   │   ├── orders/
+│   │   │   ├── payment/
+│   │   │   ├── reviews/
+│   │   │   ├── search/
+│   │   │   ├── sellers/
+│   │   │   ├── referrals/
+│   │   │   ├── rewards/
+│   │   │   ├── promotions/
+│   │   │   ├── upload/
+│   │   │   └── admin/
+│   │   ├── layout.tsx
+│   │   └── globals.css
+│   ├── components/
+│   │   ├── ui/                          (shadcn components)
+│   │   ├── layout/
+│   │   │   ├── Header.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── MegaMenu.tsx
+│   │   │   ├── MobileNav.tsx
+│   │   │   ├── SearchBar.tsx
+│   │   │   └── AnnouncementBar.tsx
+│   │   ├── product/
+│   │   │   ├── ProductCard.tsx
+│   │   │   ├── ProductGrid.tsx
+│   │   │   ├── ProductGallery.tsx
+│   │   │   ├── ProductInfo.tsx
+│   │   │   ├── VariantSelector.tsx
+│   │   │   ├── ReviewSection.tsx
+│   │   │   └── SimilarProducts.tsx
+│   │   ├── cart/
+│   │   │   ├── CartItem.tsx
+│   │   │   ├── CartSummary.tsx
+│   │   │   └── MiniCart.tsx
+│   │   ├── checkout/
+│   │   │   ├── AddressStep.tsx
+│   │   │   ├── PaymentStep.tsx
+│   │   │   └── OrderSummary.tsx
+│   │   ├── home/
+│   │   │   ├── HeroCarousel.tsx
+│   │   │   ├── CategoryStrip.tsx
+│   │   │   ├── FlashSaleSection.tsx
+│   │   │   ├── DealOfTheDay.tsx
+│   │   │   ├── CuratedCollections.tsx
+│   │   │   ├── BrandGrid.tsx
+│   │   │   └── ResellerBanner.tsx
+│   │   ├── filters/
+│   │   │   ├── FilterSidebar.tsx
+│   │   │   ├── PriceRangeSlider.tsx
+│   │   │   ├── ColorSwatches.tsx
+│   │   │   └── SizeSelector.tsx
+│   │   ├── order/
+│   │   │   ├── OrderTracker.tsx
+│   │   │   ├── OrderCard.tsx
+│   │   │   └── OrderTimeline.tsx
+│   │   ├── seller/
+│   │   │   ├── SellerProductForm.tsx
+│   │   │   ├── SellerOrderTable.tsx
+│   │   │   └── RevenueChart.tsx
+│   │   ├── admin/
+│   │   │   ├── DashboardStats.tsx
+│   │   │   ├── DataTable.tsx
+│   │   │   └── Charts.tsx
+│   │   └── shared/
+│   │       ├── CountdownTimer.tsx
+│   │       ├── RatingStars.tsx
+│   │       ├── PriceBadge.tsx
+│   │       ├── TrustBadges.tsx
+│   │       ├── ShareButtons.tsx
+│   │       ├── EmptyState.tsx
+│   │       ├── SkeletonLoader.tsx
+│   │       ├── ConfettiEffect.tsx
+│   │       └── Toast.tsx
+│   ├── lib/
+│   │   ├── prisma.ts                    (singleton client)
+│   │   ├── auth.ts                      (NextAuth config)
+│   │   ├── razorpay.ts                  (Razorpay client)
+│   │   ├── utils.ts                     (helper functions)
+│   │   ├── validators.ts                (Zod schemas)
+│   │   ├── constants.ts                 (app-wide constants)
+│   │   └── cloudinary.ts               (upload config)
+│   ├── hooks/
+│   │   ├── useCart.ts
+│   │   ├── useWishlist.ts
+│   │   ├── useSearch.ts
+│   │   ├── useDebounce.ts
+│   │   ├── useCountdown.ts
+│   │   └── useMediaQuery.ts
+│   ├── store/
+│   │   ├── cartStore.ts                 (Zustand)
+│   │   ├── wishlistStore.ts
+│   │   ├── searchStore.ts
+│   │   └── uiStore.ts
+│   ├── types/
+│   │   └── index.ts                     (shared TypeScript types)
+│   └── middleware.ts                     (auth + route protection)
+├── .env.example
+├── .eslintrc.json
+├── .prettierrc
+├── next.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+├── package.json
+└── README.md
+```
+
+---
+
+## SECTION 11 — ENVIRONMENT VARIABLES
+
+Create a `.env.example` with:
+
+```env
+# Database
+DATABASE_URL=postgresql://user:password@host:5432/kartigo
+
+# NextAuth
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret-key-here
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Razorpay
+RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
+RAZORPAY_KEY_SECRET=your-razorpay-test-secret
+
+# Cloudinary (for image uploads)
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+
+# Resend (for emails)
+RESEND_API_KEY=your-resend-api-key
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_NAME=Kartigo
+```
+
+---
+
+## SECTION 12 — QUALITY CHECKLIST (Self-Audit Before Considering Done)
+
+Before you call this project complete, verify every single item:
+
+### Functionality
+- [ ] Homepage loads with all sections populated with real data
+- [ ] Category pages show filtered products with working filters
+- [ ] Product detail page shows all info, gallery works, variants selectable
+- [ ] Search returns relevant results with autocomplete
+- [ ] Cart: add, update quantity, remove, coupon application — all work
+- [ ] Wishlist: add, remove, move to cart — all work
+- [ ] Checkout flow completes from address → payment → confirmation
+- [ ] Razorpay payment popup opens and processes (test mode)
+- [ ] Order tracking page shows timeline for an order
+- [ ] User can register, login, logout, edit profile
+- [ ] User can write reviews on purchased products
+- [ ] Referral links generate and track correctly
+- [ ] KartiCoins earn on purchase, display in account, redeemable at checkout
+- [ ] Share & Earn generates unique links with tracking
+- [ ] Flash sale countdown timers work in real-time
+- [ ] Seller dashboard: CRUD products, manage orders, view revenue
+- [ ] Admin panel: manage users, products, orders, categories, promotions
+- [ ] All forms validate properly with clear error messages
+
+### UI/UX
+- [ ] Mobile responsive on all pages (test at 375px width)
+- [ ] Desktop layout polished (test at 1440px width)
+- [ ] Dark mode toggle works (if implemented)
+- [ ] Loading states (skeletons) on all async content
+- [ ] Error states shown gracefully (not white screens or console errors)
+- [ ] Empty states on lists (cart, wishlist, orders, search results)
+- [ ] Animations are smooth, not janky
+- [ ] Typography hierarchy is clear and consistent
+- [ ] Color palette used consistently throughout
+- [ ] Hover states on all interactive elements
+
+### Technical
+- [ ] TypeScript strict mode, no `any` types
+- [ ] No console.log statements in production code
+- [ ] API routes return proper HTTP status codes
+- [ ] Authentication guards on protected routes
+- [ ] Database queries are efficient (no N+1 problems)
+- [ ] Environment variables properly used (no hardcoded secrets)
+- [ ] Prisma schema is complete and migrations run cleanly
+- [ ] Seed data populates without errors
+- [ ] `npm run build` completes without errors
+- [ ] `npm run lint` passes
+- [ ] Vercel deployment config is correct
+
+---
+
+## SECTION 13 — FINAL WORDS
+
+You have everything you need. The vision is clear. The architecture is defined. The features are specified down to individual UI elements. The database schema is mapped. The API routes are listed. The component structure is organized.
+
+There is no ambiguity left. There is no room for "I wasn't sure what you meant." Every question has been answered in this document.
+
+**Now build Kartigo.**
+
+Build it like the engineers at Amazon, Flipkart, Meesho, and Ajio all quit their jobs and came together to create something better than all four platforms combined. Build it like your reputation depends on it — because the person reading the output will know the difference between "good enough" and "exceptional."
+
+This is not a tutorial project. This is not a demo. This is not a proof of concept.
+
+**This is Kartigo. Build it like it matters. Because it does.** 🚀
+
+---
+
+*End of Build Prompt. Total specification coverage: 13 sections, 30+ pages, 50+ features, 100+ components, complete database schema, full API architecture, detailed UI specs, and comprehensive seed data requirements. Zero ambiguity. Zero excuses.*
