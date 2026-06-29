@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "_8X1dP6IowwRSlcmJ33_0"
+uri = "file://kartigo-final.zip"
+type = "unspecified"
+title = "kartigo-final.zip — Production-ready Kartigo project"
