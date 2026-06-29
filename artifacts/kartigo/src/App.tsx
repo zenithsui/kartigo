@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home";
 import AllProductsPage from "@/pages/all-products";
 import ElectronicsPage from "@/pages/electronics";
+import JerseysPage from "@/pages/jerseys";
 import FashionPage from "@/pages/fashion";
 import HomeKitchenPage from "@/pages/home-kitchen";
 import BeautyPage from "@/pages/beauty";
@@ -65,6 +66,7 @@ function Router() {
       {/* Category pages — each has its own file */}
       <Route path="/products" component={AllProductsPage} />
       <Route path="/electronics" component={ElectronicsPage} />
+      <Route path="/jerseys" component={JerseysPage} />
       <Route path="/fashion" component={FashionPage} />
       <Route path="/home-kitchen" component={HomeKitchenPage} />
       <Route path="/beauty" component={BeautyPage} />
