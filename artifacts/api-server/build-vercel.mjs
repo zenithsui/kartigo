@@ -65,11 +65,12 @@ async function main() {
   await mkdir(funcDir, { recursive: true });
 
   await esbuild({
-    entryPoints: [path.resolve(__dirname, "src/app.ts")],
+    entryPoints: [{ in: path.resolve(__dirname, "src/app.ts"), out: "index" }],
     platform: "node",
     bundle: true,
     format: "esm",
-    outfile: path.resolve(funcDir, "index.mjs"),
+    outdir: funcDir,
+    outExtension: { ".js": ".mjs" },
     logLevel: "info",
     external: EXTERNALS,
     sourcemap: false,
